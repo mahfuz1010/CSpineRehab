@@ -54,6 +54,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .drag-handle{color:var(--text3);font-size:14px;display:flex;flex-direction:column;gap:3px;flex-shrink:0;padding:8px 4px;cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent}
 .drag-handle span{display:block;width:14px;height:2px;background:currentColor;border-radius:2px}
 .plan-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);min-width:20px}
+.plan-check{width:16px;height:16px;accent-color:#4ade80;cursor:pointer;flex-shrink:0}
 .plan-name{font-size:13px;color:var(--text);flex:1}
 .plan-tag{font-size:10px;padding:2px 7px;border-radius:10px;font-family:'DM Mono',monospace;flex-shrink:0}
 .tag-stab{background:var(--blue-dim);color:var(--blue)}
@@ -63,6 +64,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .tag-seated{background:rgba(251,113,133,.1);color:#fb7185}
 .plan-meta{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);white-space:nowrap}
 .plan-note{font-size:11px;color:var(--text3);text-align:center;margin-bottom:1.5rem;line-height:1.6}
+.selected-summary{font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);margin:-.5rem 0 1.5rem}
 
 .start-btn{width:100%;padding:16px;background:var(--green);color:#0a1a0f;border:none;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .2s;letter-spacing:.01em}
 .start-btn:hover{background:#6ee7a0;transform:translateY(-1px)}
@@ -197,6 +199,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   .time-btn .mins{font-size:22px}
   .plan-meta{display:none}
   .plan-item{gap:6px;padding:9px 10px}
+  .plan-check{width:15px;height:15px}
   .plan-name{font-size:12px}
   .illus-wrap{width:88px;height:88px}
   .illus-wrap svg{width:72px;height:72px}
@@ -228,6 +231,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   <div class="logo">cervical spine rehab · C5/C6/C7</div>
   <h1 class="setup-title">Your session<br>starts here.</h1>
   <p class="setup-sub">Guided routine for C5/C6/C7 disc herniation. Drag to reorder exercises. Clinically-appropriate timing for each movement.</p>
+  <div class="selected-summary" id="selected-summary">selected: 00:00 · 0 exercises</div>
 
   <div class="section-label">Session length</div>
   <div class="time-selector">
@@ -247,7 +251,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
   <div class="section-label">Exercise order — drag to rearrange</div>
   <div class="plan-list" id="plan-preview"></div>
-  <p class="plan-note">Drag any exercise to change the order · grayed items may not fit in short sessions</p>
+  <p class="plan-note">Tap a duration to randomize a starting set. Check or uncheck any exercise, then drag to reorder.</p>
   <button class="start-btn" onclick="startSession()">Begin session →</button>
 </div>
 
@@ -785,6 +789,7 @@ function calcExTime(ex) {
 let chosenMins = 5;
 let masterOrder = ALL_EXERCISES.map(e => e.id); // drag order
 let sessionPlan = [];
+let selectedIds = new Set();
 let audioCtx = null;
 let soundEnabled = true;
 let state = {
@@ -881,6 +886,70 @@ function playPhaseStartSound(type) {
   playTimerStartSound();
 }
 
+function formatSeconds(sec) {
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+}
+
+function getSelectedPlanByOrder() {
+  return masterOrder
+    .filter(id => selectedIds.has(id))
+    .map(id => ALL_EXERCISES.find(e => e.id === id))
+    .filter(Boolean);
+}
+
+function getSelectedTotalSec() {
+  return getSelectedPlanByOrder().reduce((sum, ex) => sum + calcExTime(ex), 0);
+}
+
+function shuffleArray(arr) {
+  const next = [...arr];
+  for (let i = next.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [next[i], next[j]] = [next[j], next[i]];
+  }
+  return next;
+}
+
+function applyRandomPreset(mins) {
+  const budget = mins * 60;
+  const randomPool = shuffleArray(ALL_EXERCISES.map(e => e.id));
+  const picked = new Set();
+  let used = 0;
+
+  for (let i = 0; i < randomPool.length; i++) {
+    const id = randomPool[i];
+    const ex = ALL_EXERCISES.find(e => e.id === id);
+    const t = calcExTime(ex);
+    if (used + t <= budget - 5) {
+      picked.add(id);
+      used += t;
+    }
+  }
+
+  if (picked.size === 0) {
+    const shortest = [...ALL_EXERCISES].sort((a, b) => calcExTime(a) - calcExTime(b))[0];
+    if (shortest) picked.add(shortest.id);
+  }
+
+  selectedIds = picked;
+}
+
+function updateSelectedSummary() {
+  const totalSec = getSelectedTotalSec();
+  const summary = document.getElementById('selected-summary');
+  if (summary) {
+    summary.textContent = 'selected: ' + formatSeconds(totalSec) + ' · ' + selectedIds.size + ' exercises';
+  }
+}
+
+function onExerciseToggle(id, checked) {
+  if (checked) selectedIds.add(id);
+  else selectedIds.delete(id);
+  renderSetup();
+}
+
 // ════════════════════════════════════════════════════════════════
 // SETUP
 // ════════════════════════════════════════════════════════════════
@@ -889,38 +958,23 @@ function selectTime(m) {
   document.getElementById('btn5').classList.toggle('active', m===5);
   document.getElementById('btn10').classList.toggle('active', m===10);
   document.getElementById('btn15').classList.toggle('active', m===15);
+  applyRandomPreset(m);
   renderSetup();
 }
 
-function buildPlan(mins, order) {
-  const budget = mins * 60;
-  let plan = [], used = 0;
-  for (let id of order) {
-    const ex = ALL_EXERCISES.find(e => e.id === id);
-    if (!ex) continue;
-    const t = calcExTime(ex);
-    if (used + t <= budget - 5) { plan.push(ex); used += t; }
-  }
-  return plan;
-}
-
 function renderSetup() {
-  const p5 = buildPlan(5, masterOrder);
-  const p10 = buildPlan(10, masterOrder);
-  const p15 = buildPlan(15, masterOrder);
-  document.getElementById('count5').textContent = p5.length + ' exercises';
-  document.getElementById('count10').textContent = p10.length + ' exercises';
-  document.getElementById('count15').textContent = p15.length + ' exercises';
+  updateSelectedSummary();
+  document.getElementById('count5').textContent = 'randomize';
+  document.getElementById('count10').textContent = 'randomize';
+  document.getElementById('count15').textContent = 'randomize';
 
-  const plan = buildPlan(chosenMins, masterOrder);
-  const planIds = plan.map(e => e.id);
   const el = document.getElementById('plan-preview');
   el.innerHTML = '';
 
   masterOrder.forEach((id, i) => {
     const ex = ALL_EXERCISES.find(e => e.id === id);
     if (!ex) return;
-    const inPlan = planIds.includes(id);
+    const inPlan = selectedIds.has(id);
     const meta = ex.type === 'hold'
       ? `${ex.sets}×${ex.repsPerSet} reps · ${ex.holdSec}s`
       : `${ex.sets}×${ex.setDuration}s`;
@@ -932,6 +986,7 @@ function renderSetup() {
     item.innerHTML = `
       <div class="drag-handle" aria-label="drag"><span></span><span></span><span></span></div>
       <span class="plan-num">${String(i+1).padStart(2,'0')}</span>
+      <input class="plan-check" type="checkbox" ${inPlan ? 'checked' : ''} aria-label="Select ${ex.name}">
       <span class="plan-name">${ex.name}</span>
       ${ex.seated ? '<span class="plan-tag tag-seated" title="Can be done seated">seat</span>' : ''}
       <span class="plan-tag ${CATEGORY_TAGS[ex.category]||'tag-stab'}">${ex.category.toLowerCase()}</span>
@@ -940,6 +995,9 @@ function renderSetup() {
     el.appendChild(item);
     // attach after append so event is reliable
     item.querySelector('.info-btn').addEventListener('click', e => { e.stopPropagation(); openModal(id, e); });
+    item.querySelector('.plan-check').addEventListener('change', e => {
+      onExerciseToggle(id, e.target.checked);
+    });
   });
 
   initDrag();
@@ -958,13 +1016,13 @@ function initDrag() {
 }
 
 function onItemMouseDown(e) {
-  if (e.target.closest('.info-btn')) return; // ignore info button clicks
+  if (e.target.closest('.info-btn') || e.target.closest('.plan-check')) return;
   e.preventDefault();
   beginDrag(e.currentTarget, e.clientX, e.clientY);
 }
 
 function onItemTouchStart(e) {
-  if (e.target.closest('.info-btn')) return;
+  if (e.target.closest('.info-btn') || e.target.closest('.plan-check')) return;
   if (!e.target.closest('.drag-handle')) return; // only drag from handle on touch; allow normal scroll elsewhere
   e.preventDefault();
   const t = e.touches[0];
@@ -1050,15 +1108,11 @@ function onDragEnd() {
   masterOrder = [...list.querySelectorAll('.plan-item')].map(it => it.dataset.id);
 
   // Re-number & re-opacity
-  const plan = buildPlan(chosenMins, masterOrder);
-  const planIds = plan.map(ex => ex.id);
   [...list.querySelectorAll('.plan-item')].forEach((it, i) => {
     it.querySelector('.plan-num').textContent = String(i + 1).padStart(2, '0');
-    it.style.opacity = planIds.includes(it.dataset.id) ? '1' : '0.4';
+    it.style.opacity = selectedIds.has(it.dataset.id) ? '1' : '0.4';
   });
-  document.getElementById('count5').textContent  = buildPlan(5,  masterOrder).length + ' exercises';
-  document.getElementById('count10').textContent = buildPlan(10, masterOrder).length + ' exercises';
-  document.getElementById('count15').textContent = buildPlan(15, masterOrder).length + ' exercises';
+  updateSelectedSummary();
 
   document.removeEventListener('mousemove', onDragMove);
   document.removeEventListener('touchmove', onDragMove);
@@ -1071,12 +1125,13 @@ function onDragEnd() {
 // SESSION
 // ════════════════════════════════════════════════════════════════
 function startSession() {
-  sessionPlan = buildPlan(chosenMins, masterOrder);
+  sessionPlan = getSelectedPlanByOrder();
   if (sessionPlan.length === 0) return;
   ensureAudioContext();
+  const totalSec = getSelectedTotalSec();
   state = {exIdx:0,setIdx:0,repIdx:0,phase:'prep',
     phaseTime:PREP_TIME,phaseMax:PREP_TIME,
-    totalLeft:chosenMins*60,totalMax:chosenMins*60,
+    totalLeft:totalSec,totalMax:totalSec,
     ticker:null,paused:false,setsCompleted:0,exCompleted:0,completedNames:[]};
   showScreen('s-session');
   enterPhase('prep');
@@ -1341,6 +1396,7 @@ function closeModal(event) {
   document.body.style.overflow = '';
 }
 
+applyRandomPreset(chosenMins);
 renderSetup();
 updateSoundButton();
 </script>
