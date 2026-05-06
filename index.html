@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cervical Spine Session</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0e0f11;--surface:#161719;--surface2:#1e2023;--surface3:#252729;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#f0ede8;--text2:#8a8882;--text3:#55534f;
+  --green:#4ade80;--green-dim:rgba(74,222,128,0.10);
+  --amber:#fbbf24;--amber-dim:rgba(251,191,36,0.10);
+  --blue:#60a5fa;--blue-dim:rgba(96,165,250,0.10);
+  --red:#f87171;--red-dim:rgba(248,113,113,0.09);
+  --purple:#a78bfa;--purple-dim:rgba(167,139,250,0.10);
+  --r:12px;--rs:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem 5rem}
+.app{width:100%;max-width:540px}
+.screen{display:none;animation:fadeIn 0.3s ease}
+.screen.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── SETUP ── */
+.logo{font-family:'Instrument Serif',serif;font-style:italic;font-size:13px;color:var(--text3);letter-spacing:.05em;margin-bottom:2.5rem;padding-top:.5rem}
+.setup-title{font-family:'Instrument Serif',serif;font-size:36px;line-height:1.15;margin-bottom:.4rem}
+.setup-sub{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:2rem}
+.section-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
+.time-selector{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:2rem}
+.time-btn{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1rem;cursor:pointer;transition:all .2s;text-align:left}
+.time-btn:hover{border-color:var(--border2);background:var(--surface2)}
+.time-btn.active{border-color:var(--green);background:var(--green-dim)}
+.time-btn .mins{font-family:'Instrument Serif',serif;font-size:28px;color:var(--text);display:block}
+.time-btn.active .mins{color:var(--green)}
+.time-btn .mins-label{font-size:12px;color:var(--text2);display:block;margin-top:2px}
+.time-btn .mins-count{font-size:11px;color:var(--text3);margin-top:6px;font-family:'DM Mono',monospace}
+
+/* drag list */
+.plan-list{display:flex;flex-direction:column;gap:5px;margin-bottom:2rem}
+.plan-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);cursor:grab;user-select:none;transition:border-color .15s,background .15s;touch-action:none}
+.plan-item:active{cursor:grabbing}
+.plan-item.drag-over{border-color:var(--green);background:var(--green-dim)}
+.plan-item.dragging{opacity:.2 !important;cursor:grabbing}
+.drag-handle{color:var(--text3);font-size:14px;display:flex;flex-direction:column;gap:3px;flex-shrink:0;padding:4px 2px;cursor:grab}
+.drag-handle span{display:block;width:14px;height:2px;background:currentColor;border-radius:2px}
+.plan-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);min-width:20px}
+.plan-name{font-size:13px;color:var(--text);flex:1}
+.plan-tag{font-size:10px;padding:2px 7px;border-radius:10px;font-family:'DM Mono',monospace;flex-shrink:0}
+.tag-stab{background:var(--blue-dim);color:var(--blue)}
+.tag-stretch{background:var(--purple-dim);color:var(--purple)}
+.tag-mobility{background:var(--green-dim);color:var(--green)}
+.tag-posture{background:var(--amber-dim);color:var(--amber)}
+.tag-seated{background:rgba(251,113,133,.1);color:#fb7185}
+.plan-meta{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);white-space:nowrap}
+.plan-note{font-size:11px;color:var(--text3);text-align:center;margin-bottom:1.5rem;line-height:1.6}
+
+.start-btn{width:100%;padding:16px;background:var(--green);color:#0a1a0f;border:none;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .2s;letter-spacing:.01em}
+.start-btn:hover{background:#6ee7a0;transform:translateY(-1px)}
+.start-btn:active{transform:translateY(0)}
+
+/* ── SESSION ── */
+.session-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-top:.5rem}
+.session-time-left{font-family:'DM Mono',monospace;font-size:13px;color:var(--text2)}
+.session-time-left span{color:var(--text);font-size:16px}
+.ex-progress-text{font-family:'DM Mono',monospace;font-size:12px;color:var(--text3)}
+.total-bar-wrap{height:2px;background:var(--surface2);border-radius:2px;margin-bottom:1.5rem;overflow:hidden}
+.total-bar-fill{height:100%;background:var(--green);border-radius:2px;transition:width 1s linear}
+
+.ex-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem 1.25rem 1rem;margin-bottom:1rem;position:relative;overflow:hidden}
+.ex-card-glow{position:absolute;top:-40px;right:-40px;width:180px;height:180px;border-radius:50%;pointer-events:none;transition:all .5s}
+.phase-work .ex-card-glow{background:radial-gradient(circle,rgba(74,222,128,.07) 0%,transparent 70%)}
+.phase-rest .ex-card-glow{background:radial-gradient(circle,rgba(251,191,36,.07) 0%,transparent 70%)}
+.phase-prep .ex-card-glow{background:radial-gradient(circle,rgba(96,165,250,.07) 0%,transparent 70%)}
+.phase-between .ex-card-glow{background:radial-gradient(circle,rgba(251,191,36,.05) 0%,transparent 70%)}
+
+.phase-badge{display:inline-flex;align-items:center;gap:6px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:20px;margin-bottom:.75rem}
+.phase-work .phase-badge{background:var(--green-dim);color:var(--green)}
+.phase-rest .phase-badge{background:var(--amber-dim);color:var(--amber)}
+.phase-prep .phase-badge{background:var(--blue-dim);color:var(--blue)}
+.phase-between .phase-badge{background:var(--amber-dim);color:var(--amber)}
+.phase-dot{width:6px;height:6px;border-radius:50%;animation:pulse 1.5s infinite}
+.phase-work .phase-dot{background:var(--green)}
+.phase-rest .phase-dot{background:var(--amber)}
+.phase-prep .phase-dot{background:var(--blue)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* illustration + timer layout */
+.card-body{display:flex;gap:1rem;align-items:flex-start;margin-bottom:.75rem}
+.illus-wrap{flex-shrink:0;width:110px;height:110px;border-radius:var(--rs);background:var(--surface2);border:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.illus-wrap svg{width:90px;height:90px}
+.card-text{flex:1;min-width:0}
+.ex-name{font-family:'Instrument Serif',serif;font-size:22px;color:var(--text);margin-bottom:4px;line-height:1.2}
+.ex-instruction{font-size:12px;color:var(--text2);line-height:1.65}
+.ex-cue{font-size:11px;color:var(--green);background:var(--green-dim);border-radius:var(--rs);padding:7px 10px;margin-top:.75rem;font-style:italic;line-height:1.5}
+
+/* timer row */
+.timer-row{display:flex;align-items:center;gap:1rem;padding-top:.75rem;border-top:1px solid var(--border)}
+.ring-container{position:relative;flex-shrink:0;width:80px;height:80px}
+.ring-container svg{width:80px;height:80px;transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--surface2);stroke-width:5}
+.ring-fill{fill:none;stroke-width:5;stroke-linecap:round;stroke-dasharray:207;stroke-dashoffset:207;transition:stroke-dashoffset 1s linear,stroke .4s}
+.ring-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.ring-number{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;line-height:1;display:block}
+.ring-unit{font-size:9px;color:var(--text3);font-family:'DM Mono',monospace;display:block;margin-top:1px}
+.timer-details{flex:1}
+.rep-info{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);margin-bottom:6px;letter-spacing:.04em}
+.set-dots{display:flex;gap:5px;margin-bottom:5px}
+.set-dot{width:8px;height:8px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);transition:all .3s}
+.set-dot.done{background:var(--green);border-color:var(--green)}
+.set-dot.active{background:var(--blue);border-color:var(--blue);box-shadow:0 0 6px var(--blue)}
+.set-label{font-size:11px;color:var(--text2)}
+.rep-counter{display:flex;align-items:baseline;gap:5px;margin-top:3px}
+.rep-num{font-family:'DM Mono',monospace;font-size:16px;color:var(--text);font-weight:500}
+.rep-total{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3)}
+
+.next-preview{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;margin-bottom:1rem;display:flex;align-items:center;gap:12px}
+.next-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);white-space:nowrap}
+.next-name{font-size:13px;color:var(--text2);flex:1}
+
+.controls{display:flex;gap:8px;margin-bottom:1.5rem}
+.ctrl-btn{flex:1;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);color:var(--text2);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px}
+.ctrl-btn:hover{border-color:var(--border2);color:var(--text);background:var(--surface2)}
+.ctrl-btn.pause-active{border-color:var(--amber);color:var(--amber);background:var(--amber-dim)}
+.ctrl-btn.end-btn{color:var(--red)}
+.ctrl-btn.end-btn:hover{border-color:var(--red);background:var(--red-dim)}
+
+.queue-list{display:flex;flex-direction:column;gap:4px}
+.queue-item{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:var(--rs);font-size:12px;transition:all .2s}
+.queue-item.upcoming{color:var(--text3)}
+.queue-item.current{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.queue-item.completed{color:var(--text3)}
+.queue-item.completed .q-name{text-decoration:line-through;opacity:.5}
+.q-num{font-family:'DM Mono',monospace;font-size:10px;min-width:16px;color:var(--text3)}
+.q-check{width:14px;height:14px;border-radius:50%;background:var(--green-dim);display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--green);flex-shrink:0}
+.q-meta{margin-left:auto;font-family:'DM Mono',monospace;font-size:10px;color:var(--text3)}
+
+/* ── DONE ── */
+.done-icon{width:64px;height:64px;border-radius:50%;background:var(--green-dim);border:1px solid rgba(74,222,128,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;font-size:24px}
+.done-title{font-family:'Instrument Serif',serif;font-size:30px;text-align:center;margin-bottom:5px}
+.done-sub{font-size:14px;color:var(--text2);text-align:center;margin-bottom:1.75rem;line-height:1.6}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:2rem}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1rem;text-align:center}
+.stat-val{font-family:'DM Mono',monospace;font-size:22px;color:var(--text);display:block}
+.stat-lbl{font-size:11px;color:var(--text3);display:block;margin-top:3px}
+.done-ex-list{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1.25rem;margin-bottom:2rem}
+.done-ex-item{display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2)}
+.done-ex-item:last-child{border-bottom:none}
+.reset-btn{width:100%;padding:14px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;cursor:pointer;transition:all .2s}
+.reset-btn:hover{background:var(--surface2);border-color:var(--text3)}
+
+/* ── INFO BUTTON ── */
+.info-btn{width:26px;height:26px;border-radius:50%;background:var(--surface2);border:1px solid var(--border2);color:var(--text3);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-family:'DM Mono',monospace;font-weight:500;line-height:1}
+.info-btn:hover{background:var(--blue-dim);border-color:var(--blue);color:var(--blue)}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:100;display:flex;align-items:flex-end;justify-content:center;animation:modalFadeIn .2s ease;backdrop-filter:blur(4px)}
+.modal-overlay.hidden{display:none}
+.modal-sheet{background:var(--surface);border:1px solid var(--border2);border-radius:20px 20px 0 0;width:100%;max-width:540px;padding:1.5rem 1.5rem 2.5rem;animation:sheetUp .25s ease;max-height:90vh;overflow-y:auto}
+@keyframes modalFadeIn{from{opacity:0}to{opacity:1}}
+@keyframes sheetUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:var(--border2);margin:0 auto 1.25rem}
+.modal-header{display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.25rem}
+.modal-illus{width:90px;height:90px;border-radius:var(--rs);background:var(--surface2);border:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.modal-illus svg{width:80px;height:80px}
+.modal-title-block{flex:1}
+.modal-ex-name{font-family:'Instrument Serif',serif;font-size:22px;color:var(--text);line-height:1.2;margin-bottom:4px}
+.modal-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:0}
+.modal-section{margin-bottom:1rem}
+.modal-section-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
+.modal-instr{font-size:14px;color:var(--text2);line-height:1.7}
+.modal-cue{font-size:13px;color:var(--green);background:var(--green-dim);border-radius:var(--rs);padding:10px 12px;font-style:italic;line-height:1.6}
+.modal-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
+.modal-stat{background:var(--surface2);border-radius:var(--rs);padding:.75rem;text-align:center}
+.modal-stat-val{font-family:'DM Mono',monospace;font-size:16px;color:var(--text);display:block}
+.modal-stat-lbl{font-size:10px;color:var(--text3);display:block;margin-top:3px}
+.modal-close{width:100%;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text2);font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;transition:all .2s;margin-top:.5rem}
+.modal-close:hover{background:var(--surface3);color:var(--text)}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- SETUP -->
+<div id="s-setup" class="screen active">
+  <div class="logo">cervical spine rehab · C5/C6/C7</div>
+  <h1 class="setup-title">Your session<br>starts here.</h1>
+  <p class="setup-sub">Guided routine for C5/C6/C7 disc herniation. Drag to reorder exercises. Clinically-appropriate timing for each movement.</p>
+
+  <div class="section-label">Session length</div>
+  <div class="time-selector">
+    <button class="time-btn active" id="btn5" onclick="selectTime(5)">
+      <span class="mins">5</span><span class="mins-label">minutes</span>
+      <div class="mins-count" id="count5">loading...</div>
+    </button>
+    <button class="time-btn" id="btn10" onclick="selectTime(10)">
+      <span class="mins">10</span><span class="mins-label">minutes</span>
+      <div class="mins-count" id="count10">loading...</div>
+    </button>
+  </div>
+
+  <div class="section-label">Exercise order — drag to rearrange</div>
+  <div class="plan-list" id="plan-preview"></div>
+  <p class="plan-note">Drag any exercise to change the order · grayed items may not fit in short sessions</p>
+  <button class="start-btn" onclick="startSession()">Begin session →</button>
+</div>
+
+<!-- SESSION -->
+<div id="s-session" class="screen">
+  <div class="session-header">
+    <div class="session-time-left">remaining <span id="total-time-disp">--:--</span></div>
+    <div class="ex-progress-text" id="ex-progress-text">1 / 6</div>
+  </div>
+  <div class="total-bar-wrap"><div class="total-bar-fill" id="total-bar" style="width:0%"></div></div>
+
+  <div id="phase-wrapper" class="phase-prep">
+    <div class="ex-card">
+      <div class="ex-card-glow"></div>
+      <div class="phase-badge"><span class="phase-dot"></span><span id="phase-text">Get ready</span></div>
+
+      <div class="card-body">
+        <div class="illus-wrap" id="illus-wrap"></div>
+        <div class="card-text">
+          <div class="ex-name" id="ex-name-disp">—</div>
+          <div class="ex-instruction" id="ex-instr-disp">—</div>
+        </div>
+      </div>
+      <div class="ex-cue" id="ex-cue-disp" style="display:none"></div>
+
+      <div class="timer-row">
+        <div class="ring-container">
+          <svg viewBox="0 0 80 80"><circle class="ring-bg" cx="40" cy="40" r="33"/><circle class="ring-fill" id="ring-fill" cx="40" cy="40" r="33"/></svg>
+          <div class="ring-text"><span class="ring-number" id="ring-num">5</span><span class="ring-unit" id="ring-unit">sec</span></div>
+        </div>
+        <div class="timer-details">
+          <div class="rep-info" id="rep-info">—</div>
+          <div class="set-dots" id="set-dots"></div>
+          <div class="set-label" id="set-label">—</div>
+          <div class="rep-counter" id="rep-counter" style="display:none">
+            <span class="rep-num" id="rep-current">1</span>
+            <span class="rep-total" id="rep-total">/ 10 reps</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="next-preview" id="next-preview" style="display:none">
+    <span class="next-label">Up next</span><span class="next-name" id="next-name">—</span>
+  </div>
+
+  <div class="controls">
+    <button class="ctrl-btn" id="pause-btn" onclick="togglePause()">
+      <svg id="pause-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+      <span id="pause-label">Pause</span>
+    </button>
+    <button class="ctrl-btn" onclick="skipPhase()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" y1="5" x2="19" y2="19"/></svg> Skip
+    </button>
+    <button class="ctrl-btn end-btn" onclick="endSession()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> End
+    </button>
+  </div>
+
+  <div class="section-label">Queue</div>
+  <div class="queue-list" id="queue-list"></div>
+</div>
+
+<!-- DONE -->
+<div id="s-done" class="screen">
+  <div style="padding-top:1rem;text-align:center;margin-bottom:2rem">
+    <div class="done-icon">✓</div>
+    <div class="done-title">Session complete.</div>
+    <p class="done-sub">Great work. Aim to do this daily<br>or every other day for best results.</p>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card"><span class="stat-val" id="done-time">-</span><span class="stat-lbl">Time</span></div>
+    <div class="stat-card"><span class="stat-val" id="done-ex">-</span><span class="stat-lbl">Exercises</span></div>
+    <div class="stat-card"><span class="stat-val" id="done-sets">-</span><span class="stat-lbl">Sets</span></div>
+  </div>
+  <div class="done-ex-list">
+    <div class="section-label" style="margin-bottom:10px">Completed</div>
+    <div id="done-ex-list-inner"></div>
+  </div>
+  <p style="font-size:12px;color:var(--text3);text-align:center;margin-bottom:1.5rem;line-height:1.7">Stop any exercise that causes tingling or shooting arm pain.<br>Consult your physiotherapist if symptoms worsen.</p>
+  <button class="reset-btn" onclick="resetApp()">← New session</button>
+</div>
+
+</div><!-- .app -->
+
+<!-- EXERCISE INFO MODAL -->
+<div class="modal-overlay hidden" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal-sheet" id="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <div class="modal-illus" id="modal-illus"></div>
+      <div class="modal-title-block">
+        <div class="modal-ex-name" id="modal-name">—</div>
+        <div class="modal-tags" id="modal-tags"></div>
+      </div>
+    </div>
+    <div class="modal-stats" id="modal-stats"></div>
+    <div class="modal-section">
+      <div class="modal-section-label">How to do it</div>
+      <div class="modal-instr" id="modal-instr">—</div>
+    </div>
+    <div class="modal-section" id="modal-cue-wrap">
+      <div class="modal-section-label">Coaching cue</div>
+      <div class="modal-cue" id="modal-cue">—</div>
+    </div>
+    <button class="modal-close" onclick="closeModal()">Close</button>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// ANIMATED SVG ILLUSTRATIONS
+// Each returns an SVG string with CSS animations
+// ════════════════════════════════════════════════════════════════
+const ILLUS = {
+
+'chin-tuck': `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .ct-head{animation:ct-move 3s ease-in-out infinite}
+    .ct-arr{animation:ct-arr 3s ease-in-out infinite;opacity:0}
+    @keyframes ct-move{0%,100%{transform:translateX(0)}50%{transform:translateX(-7px)}}
+    @keyframes ct-arr{0%,30%{opacity:0;transform:translateX(4px)}50%,70%{opacity:1;transform:translateX(0)}100%{opacity:0}}
+  </style>
+  <g class="ct-head">
+    <ellipse cx="45" cy="22" rx="13" ry="15" fill="none" stroke="#60a5fa" stroke-width="1.8"/>
+    <circle cx="40" cy="19" r="1.5" fill="#60a5fa"/>
+    <circle cx="50" cy="19" r="1.5" fill="#60a5fa"/>
+    <path d="M40 26 Q45 30 50 26" fill="none" stroke="#60a5fa" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="45" y1="37" x2="45" y2="50" stroke="#8a8882" stroke-width="1.8"/>
+    <path d="M30 50 Q45 44 60 50" fill="none" stroke="#8a8882" stroke-width="1.8"/>
+    <line x1="38" y1="24" x2="38" y2="38" stroke="#8a8882" stroke-width="1.2" stroke-dasharray="2 2"/>
+  </g>
+  <g class="ct-arr">
+    <line x1="68" y1="28" x2="58" y2="28" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/>
+    <polyline points="61,24 57,28 61,32" fill="none" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="45" y="75" text-anchor="middle" font-size="7.5" fill="#55534f" font-family="DM Mono,monospace">chin tuck</text>
+</svg>`,
+
+'isometric': `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .iso-hand{animation:iso-push 2.5s ease-in-out infinite}
+    .iso-head{animation:iso-resist 2.5s ease-in-out infinite}
+    @keyframes iso-push{0%,100%{transform:translateX(0)}50%{transform:translateX(4px)}}
+    @keyframes iso-resist{0%,100%{transform:translateX(0)}50%{transform:translateX(1px)}}
+  </style>
+  <g class="iso-head">
+    <ellipse cx="45" cy="22" rx="13" ry="15" fill="none" stroke="#60a5fa" stroke-width="1.8"/>
+    <circle cx="40" cy="19" r="1.5" fill="#60a5fa"/>
+    <circle cx="50" cy="19" r="1.5" fill="#60a5fa"/>
+    <line x1="45" y1="37" x2="45" y2="52" stroke="#8a8882" stroke-width="1.8"/>
+    <path d="M30 52 Q45 46 60 52" fill="none" stroke="#8a8882" stroke-width="1.8"/>
+  </g>
+  <g class="iso-hand">
+    <rect x="20" y="20" width="12" height="9" rx="3" fill="none" stroke="#4ade80" stroke-width="1.5"/>
+    <line x1="26" y1="29" x2="26" y2="35" stroke="#4ade80" stroke-width="1.5"/>
+    <line x1="32" y1="24" x2="35" y2="24" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/>
+    <polyline points="33,21 37,24 33,27" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="45" y="75" text-anchor="middle" font-size="7.5" fill="#55534f" font-family="DM Mono,monospace">isometric hold</text>
+</svg>`,
+
+'shoulder-squeeze': `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .ss-body{animation:ss-sq 2.8s ease-in-out infinite}
+    @keyframes ss-sq{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.88)}}
+  </style>
+  <g class="ss-body" style="transform-origin:45px 50px">
+    <ellipse cx="45" cy="20" rx="11" ry="13" fill="none" stroke="#60a5fa" stroke-width="1.8"/>
+    <circle cx="41" cy="17" r="1.3" fill="#60a5fa"/>
+    <circle cx="49" cy="17" r="1.3" fill="#60a5fa"/>
+    <line x1="45" y1="33" x2="45" y2="44" stroke="#8a8882" stroke-width="1.8"/>
+    <path d="M22 44 Q33 38 45 44 Q57 38 68 44" fill="none" stroke="#8a8882" stroke-width="1.8"/>
+    <path d="M22 44 L22 62" stroke="#8a8882" stroke-width="1.5"/>
+    <path d="M68 44 L68 62" stroke="#8a8882" stroke-width="1.5"/>
+    <path d="M22 62 Q45 68 68 62" fill="none" stroke="#8a8882" stroke-width="1.5"/>
+    <path d="M35 41 Q45 50 55 41" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="3 2"/>
+  </g>
+  <text x="45" y="80" text-anchor="middle" font-size="7.5" fill="#55534f" font-family="DM Mono,monospace">blade squeeze</text>
+</svg>`,
+
+'bird-dog': `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .bd-arm{animation:bd-ext 3s ease-in-out infinite;transform-origin:38px 40px}
+    .bd-leg{animation:bd-leg 3s ease-in-out infinite;transform-origin:52px 42px}
+    @keyframes bd-ext{0%,100%{transform:rotate(0deg)}50%{transform:rotate(-25deg)}}
+    @keyframes bd-leg{0%,100%{transform:rotate(0deg)}50%{transform:rotate(20deg)}}
+  </style>
+  <circle cx="30" cy="30" r="10" fill="none" stroke="#60a5fa" stroke-width="1.8"/>
+  <circle cx="26" cy="27" r="1.2" fill="#60a5fa"/>
+  <circle cx="33" cy="27" r="1.2" fill="#60a5fa"/>
+  <line x1="30" y1="40" x2="45" y2="40" stroke="#8a8882" stroke-width="2"/>
+  <line x1="38" y1="40" x2="38" y2="52" stroke="#8a8882" stroke-width="1.8"/>
+  <line x1="52" y1="40" x2="52" y2="52" stroke="#8a8882" stroke-width="1.8"/>
+  <g class="bd-arm"><line x1="38" y1="40" x2="22" y2="35" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/><circle cx="22" cy="35" r="3" fill="none" stroke="#4ade80" stroke-width="1.5"/></g>
+  <g class="bd-leg"><line x1="52" y1="40" x2="70" y2="42" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round"/><circle cx="70" cy="42" r="3" fill="none" stroke="#a78bfa" stroke-width="1.5"/></g>
+  <text x="45" y="78" text-anchor="middle" font-size="7.5" fill="#55534f" font-family="DM Mono,monospace">bird-dog</text>
+</svg>`,
+
+'dead-bug': `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .db-rarm{animation:db-ra 3s ease-in-out infinite;transform-origin:45px 32px}
+    .db-lleg{animation:db-ll 3s ease-in-out infinite;transform-origin:45px 52px}
+    @keyframes db-ra{0%,100%{transform:rotate(0)}50%{transform:rotate(-40deg)}}
+    @keyframes db-ll{0%,100%{transform:rotate(0)}50%{transform:rotate(30deg)}}
+  </style>
+  <line x1="10" y1="65" x2="80" y2="65" stroke="#2C2C2A" stroke-width="2"/>
+  <ellipse cx="45" cy="28" rx="10" ry="12" fill="none" stroke="#60a5fa" stroke-width="1.8"/>
+  <circle cx="41" cy="25" r="1.2" fill="#60a5fa"/>
+  <circle cx="49" cy="25" r="1.2" fill="#60a5fa"/>
+  <line x1="45" y1="40" x2="45" y2="55" stroke="#8a8882" stroke-width="2"/>
+  <line x1="45" y1="44" x2="30" y2="42" stroke="#8a8882" stroke-width="1.8"/>
+  <g class="db-rarm"><line x1="45" y1="32" x2="62" y2="25" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/><circle cx="62" cy="25" r="3" fill="none" stroke="#4ade80" stroke-width="1.5"/></g>
+  <g class="db-lleg"><line x1="45" y1="52" x2="30" y2="60" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round"/><line x1="30" y1="60" x2="24" y2="55" stroke="#a78bfa" stroke-width="1.8" stroke-linecap="round"/></g>
+  <line x1="45" y1="52" x2="62" y2="58" stroke="#8a8882" stroke-width="1.5"/>
+  <line x1="62" y1="58" x2="68" y2="53" stroke="#8a8882" stroke-width="1.5"/>
+  <text x="45" y="78" text-anchor="middle" font-size="7.5" fill="#55534f" font-family="DM Mono,monospace">dead bug</text>
+</svg>`,
+
+'trap-stretch': `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .ts-head{animation:ts-tilt 3.5s ease-in-out infinite;transform-origin:45px 22px}
+    @keyframes ts-tilt{0%,100%{transform:rotate(0)}50%{transform:rotate(20deg)}}
+  </style>
+  <g class="ts-head">
+    <ellipse cx="45" cy="22" rx="11" ry="13" fill="none" stroke="#60a5fa" stroke-width="1.8"/>
+    <circle cx="41" cy="19" r="1.2" fill="#60a5fa"/>
+    <circle cx="49" cy="19" r="1.2" fill="#60a5fa"/>
+    <path d="M41 26 Q45 30 49 26" fill="none" stroke="#60a5fa" stroke-width="1.3" stroke-linecap="round"/>
+  </g>
+  <line x1="45" y1="35" x2="45" y2="48" stroke="#8a8882" stroke-width="1.8"/>
+  <path d="M28 48 Q45 42 62 48" fill="none" stroke="#8a8882" stroke-width="1.8"/>
+  <path d="M62 48 L62 65" stroke="#8a8882" stroke-width="1.5"/>
+  <path d="M28 48 L28 65" stroke="#8a8882" stroke-width="1.5"/>
+  <path d="M28 65 Q45 70 62 65" fill="none" stroke="#8a8882" stroke-width="1.5"/>
+  <path d="M55 22 Q68 18 68 32" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="3 2"/>
+  <text x="45" y="80" text-anchor="middle" font-size="7.5" fill="#55534f" font-family="DM Mono,monospace">trap stretch</text>
+</svg>`,
+
+'levator-stretch': `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .ls-head{animation:ls-rot 3.5s ease-in-out infinite;transform-origin:45px 22px}
+    @keyframes ls-rot{0%,100%{transform:rotate(0) translateY(0)}50%{transform:rotate(15deg) translateY(3px)}}
+  </style>
+  <g class="ls-head">
+    <ellipse cx="45" cy="22" rx="11" ry="13" fill="none" stroke="#60a5fa" stroke-width="1.8"/>
+    <circle cx="41" cy="19" r="1.2" fill="#60a5fa"/>
+    <circle cx="49" cy="19" r="1.2" fill="#60a5fa"/>
+  </g>
+  <line x1="45" y1="35" x2="45" y2="48" stroke="#8a8882" stroke-width="1.8"/>
+  <path d="M28 48 Q45 42 62 48" fill="none" stroke="#8a8882" stroke-width="1.8"/>
+  <path d="M28 48 L28 65" stroke="#8a8882" stroke-width="1.5"/>
+  <path d="M62 48 L62 65" stroke="#8a8882" stroke-width="1.5"/>
+  <path d="M28 65 Q45 70 62 65" fill="none" stroke="#8a8882" stroke-width="1.5"/>
+  <path d="M53 14 Q65 8 68 20" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="3 2"/>
+  <text x="45" y="80" text-anchor="middle" font-size="7.5" fill="#55534f" font-family="DM Mono,monospace">levator stretch</text>
+</svg>`,
+
+'wall-angel': `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .wa-arms{animation:wa-slide 3s ease-in-out infinite;transform-origin:45px 43px}
+    @keyframes wa-slide{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  </style>
+  <rect x="76" y="10" width="4" height="70" fill="#1e2023" stroke="#2C2C2A" stroke-width="1"/>
+  <ellipse cx="45" cy="20" rx="10" ry="12" fill="none" stroke="#60a5fa" stroke-width="1.8"/>
+  <line x1="45" y1="32" x2="45" y2="48" stroke="#8a8882" stroke-width="2"/>
+  <line x1="45" y1="48" x2="30" y2="58" stroke="#8a8882" stroke-width="1.8"/>
+  <line x1="45" y1="48" x2="60" y2="58" stroke="#8a8882" stroke-width="1.8"/>
+  <line x1="45" y1="58" x2="38" y2="72" stroke="#8a8882" stroke-width="1.5"/>
+  <line x1="45" y1="58" x2="52" y2="72" stroke="#8a8882" stroke-width="1.5"/>
+  <g class="wa-arms">
+    <line x1="28" y1="43" x2="76" y2="43" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="28" y1="43" x2="28" y2="38" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="76" y1="43" x2="76" y2="38" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+  <text x="38" y="83" text-anchor="middle" font-size="7.5" fill="#55534f" font-family="DM Mono,monospace">wall angel</text>
+</svg>`,
+
+'nerve-glide': `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .ng-wrist{animation:ng-flex 2s ease-in-out infinite;transform-origin:65px 45px}
+    .ng-wave{animation:ng-wave 2s ease-in-out infinite}
+    @keyframes ng-flex{0%,100%{transform:rotate(0)}50%{transform:rotate(-20deg)}}
+    @keyframes ng-wave{0%,100%{opacity:.3;stroke-dashoffset:20}50%{opacity:1;stroke-dashoffset:0}}
+  </style>
+  <ellipse cx="22" cy="22" rx="10" ry="12" fill="none" stroke="#60a5fa" stroke-width="1.8"/>
+  <line x1="22" y1="34" x2="22" y2="48" stroke="#8a8882" stroke-width="1.8"/>
+  <path d="M10 48 Q22 43 34 48" fill="none" stroke="#8a8882" stroke-width="1.8"/>
+  <line x1="34" y1="48" x2="42" y2="44" stroke="#8a8882" stroke-width="1.8"/>
+  <line x1="42" y1="44" x2="65" y2="45" stroke="#8a8882" stroke-width="2"/>
+  <g class="ng-wrist">
+    <rect x="62" y="40" width="10" height="10" rx="3" fill="none" stroke="#4ade80" stroke-width="1.5"/>
+    <line x1="64" y1="40" x2="62" y2="36" stroke="#4ade80" stroke-width="1.2"/>
+    <line x1="67" y1="40" x2="67" y2="35" stroke="#4ade80" stroke-width="1.2"/>
+    <line x1="70" y1="40" x2="72" y2="35" stroke="#4ade80" stroke-width="1.2"/>
+  </g>
+  <path class="ng-wave" d="M40 60 Q47 55 54 60 Q61 65 68 60" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="5 3"/>
+  <text x="40" y="78" text-anchor="middle" font-size="7.5" fill="#55534f" font-family="DM Mono,monospace">nerve glide</text>
+</svg>`,
+
+'seated-rotation': `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .sr-head{animation:sr-rot 3s ease-in-out infinite;transform-origin:45px 22px}
+    .sr-arr{animation:sr-arr 3s ease-in-out infinite}
+    @keyframes sr-rot{0%,100%{transform:rotate(0)}50%{transform:rotate(30deg)}}
+    @keyframes sr-arr{0%,100%{opacity:.2}50%{opacity:1}}
+  </style>
+  <rect x="30" y="60" width="30" height="6" rx="2" fill="none" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="35" y1="66" x2="33" y2="75" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="55" y1="66" x2="57" y2="75" stroke="#55534f" stroke-width="1.5"/>
+  <g class="sr-head">
+    <ellipse cx="45" cy="22" rx="11" ry="13" fill="none" stroke="#60a5fa" stroke-width="1.8"/>
+    <circle cx="41" cy="19" r="1.2" fill="#60a5fa"/>
+    <circle cx="49" cy="19" r="1.2" fill="#60a5fa"/>
+    <line x1="45" y1="35" x2="45" y2="50" stroke="#8a8882" stroke-width="1.8"/>
+    <path d="M32 50 Q45 44 58 50" fill="none" stroke="#8a8882" stroke-width="1.8"/>
+    <line x1="32" y1="50" x2="32" y2="60" stroke="#8a8882" stroke-width="1.5"/>
+    <line x1="58" y1="50" x2="58" y2="60" stroke="#8a8882" stroke-width="1.5"/>
+  </g>
+  <g class="sr-arr">
+    <path d="M62 15 Q72 22 62 30" fill="none" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/>
+    <polyline points="59,28 63,31 64,27" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="45" y="83" text-anchor="middle" font-size="7.5" fill="#55534f" font-family="DM Mono,monospace">neck rotation</text>
+</svg>`,
+
+'seated-flexion': `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .sf-head{animation:sf-nod 3.5s ease-in-out infinite;transform-origin:45px 32px}
+    @keyframes sf-nod{0%,100%{transform:rotate(0)}50%{transform:rotate(25deg)}}
+  </style>
+  <rect x="30" y="60" width="30" height="6" rx="2" fill="none" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="35" y1="66" x2="33" y2="75" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="55" y1="66" x2="57" y2="75" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="45" y1="36" x2="45" y2="60" stroke="#8a8882" stroke-width="1.8"/>
+  <path d="M32 50 Q45 44 58 50" fill="none" stroke="#8a8882" stroke-width="1.8"/>
+  <line x1="32" y1="50" x2="32" y2="60" stroke="#8a8882" stroke-width="1.5"/>
+  <line x1="58" y1="50" x2="58" y2="60" stroke="#8a8882" stroke-width="1.5"/>
+  <g class="sf-head">
+    <ellipse cx="45" cy="22" rx="11" ry="13" fill="none" stroke="#60a5fa" stroke-width="1.8"/>
+    <circle cx="41" cy="19" r="1.2" fill="#60a5fa"/>
+    <circle cx="49" cy="19" r="1.2" fill="#60a5fa"/>
+  </g>
+  <path d="M55 38 Q60 42 55 48" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="3 2"/>
+  <text x="45" y="83" text-anchor="middle" font-size="7.5" fill="#55534f" font-family="DM Mono,monospace">neck flexion</text>
+</svg>`,
+
+'seated-side-bend': `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .sb-head{animation:sb-tilt 3.5s ease-in-out infinite;transform-origin:45px 35px}
+    @keyframes sb-tilt{0%,100%{transform:rotate(0)}50%{transform:rotate(22deg)}}
+  </style>
+  <rect x="30" y="62" width="30" height="6" rx="2" fill="none" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="35" y1="68" x2="33" y2="76" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="55" y1="68" x2="57" y2="76" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="45" y1="37" x2="45" y2="62" stroke="#8a8882" stroke-width="1.8"/>
+  <path d="M32 52 Q45 46 58 52" fill="none" stroke="#8a8882" stroke-width="1.8"/>
+  <line x1="32" y1="52" x2="32" y2="62" stroke="#8a8882" stroke-width="1.5"/>
+  <line x1="58" y1="52" x2="58" y2="62" stroke="#8a8882" stroke-width="1.5"/>
+  <g class="sb-head">
+    <ellipse cx="45" cy="22" rx="11" ry="13" fill="none" stroke="#60a5fa" stroke-width="1.8"/>
+    <circle cx="41" cy="19" r="1.2" fill="#60a5fa"/>
+    <circle cx="49" cy="19" r="1.2" fill="#60a5fa"/>
+    <path d="M41 26 Q45 30 49 26" fill="none" stroke="#60a5fa" stroke-width="1.3" stroke-linecap="round"/>
+  </g>
+  <path d="M20 26 Q25 35 20 44" fill="none" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="3 2"/>
+  <text x="45" y="84" text-anchor="middle" font-size="7.5" fill="#55534f" font-family="DM Mono,monospace">side bend</text>
+</svg>`,
+
+'doorway-stretch': `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .ds-body{animation:ds-step 3s ease-in-out infinite;transform-origin:45px 50px}
+    @keyframes ds-step{0%,100%{transform:translateX(0)}50%{transform:translateX(5px)}}
+  </style>
+  <rect x="10" y="8" width="5" height="72" fill="none" stroke="#2C2C2A" stroke-width="2"/>
+  <rect x="75" y="8" width="5" height="72" fill="none" stroke="#2C2C2A" stroke-width="2"/>
+  <rect x="10" y="8" width="70" height="5" fill="none" stroke="#2C2C2A" stroke-width="2"/>
+  <g class="ds-body">
+    <ellipse cx="45" cy="23" rx="10" ry="12" fill="none" stroke="#60a5fa" stroke-width="1.8"/>
+    <circle cx="41" cy="20" r="1.2" fill="#60a5fa"/>
+    <circle cx="49" cy="20" r="1.2" fill="#60a5fa"/>
+    <line x1="45" y1="35" x2="45" y2="52" stroke="#8a8882" stroke-width="2"/>
+    <line x1="45" y1="38" x2="15" y2="36" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="15" y1="36" x2="15" y2="28" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="45" y1="38" x2="75" y2="36" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="75" y1="36" x2="75" y2="28" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="45" y1="52" x2="38" y2="68" stroke="#8a8882" stroke-width="1.5"/>
+    <line x1="45" y1="52" x2="52" y2="68" stroke="#8a8882" stroke-width="1.5"/>
+  </g>
+  <text x="45" y="84" text-anchor="middle" font-size="7.5" fill="#55534f" font-family="DM Mono,monospace">doorway stretch</text>
+</svg>`,
+
+'seated-scapular': `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .sc-arms{animation:sc-pull 2.8s ease-in-out infinite;transform-origin:45px 42px}
+    @keyframes sc-pull{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.8)}}
+  </style>
+  <rect x="30" y="60" width="30" height="6" rx="2" fill="none" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="35" y1="66" x2="33" y2="75" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="55" y1="66" x2="57" y2="75" stroke="#55534f" stroke-width="1.5"/>
+  <ellipse cx="45" cy="22" rx="10" ry="12" fill="none" stroke="#60a5fa" stroke-width="1.8"/>
+  <circle cx="41" cy="19" r="1.2" fill="#60a5fa"/>
+  <circle cx="49" cy="19" r="1.2" fill="#60a5fa"/>
+  <line x1="45" y1="34" x2="45" y2="60" stroke="#8a8882" stroke-width="1.8"/>
+  <g class="sc-arms" style="transform-origin:45px 42px">
+    <path d="M32 42 Q45 36 58 42" fill="none" stroke="#8a8882" stroke-width="1.8"/>
+    <line x1="32" y1="42" x2="32" y2="60" stroke="#8a8882" stroke-width="1.5"/>
+    <line x1="58" y1="42" x2="58" y2="60" stroke="#8a8882" stroke-width="1.5"/>
+    <line x1="32" y1="42" x2="18" y2="38" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="58" y1="42" x2="72" y2="38" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M36 39 Q45 46 54 39" fill="none" stroke="#4ade80" stroke-width="1.2" stroke-dasharray="2 2"/>
+  </g>
+  <text x="45" y="83" text-anchor="middle" font-size="7.5" fill="#55534f" font-family="DM Mono,monospace">scapular retract</text>
+</svg>`,
+
+'pec-stretch': `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .ps-chest{animation:ps-open 3s ease-in-out infinite;transform-origin:45px 42px}
+    @keyframes ps-open{0%,100%{transform:scaleX(1)}50%{transform:scaleX(1.15)}}
+  </style>
+  <ellipse cx="45" cy="20" rx="10" ry="12" fill="none" stroke="#60a5fa" stroke-width="1.8"/>
+  <circle cx="41" cy="17" r="1.2" fill="#60a5fa"/>
+  <circle cx="49" cy="17" r="1.2" fill="#60a5fa"/>
+  <line x1="45" y1="32" x2="45" y2="50" stroke="#8a8882" stroke-width="2"/>
+  <g class="ps-chest">
+    <path d="M28 40 Q45 34 62 40" fill="none" stroke="#8a8882" stroke-width="1.8"/>
+    <line x1="28" y1="40" x2="14" y2="36" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="62" y1="40" x2="76" y2="36" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="14" y1="36" x2="14" y2="28" stroke="#4ade80" stroke-width="1.8"/>
+    <line x1="76" y1="36" x2="76" y2="28" stroke="#4ade80" stroke-width="1.8"/>
+  </g>
+  <line x1="45" y1="50" x2="38" y2="68" stroke="#8a8882" stroke-width="1.5"/>
+  <line x1="45" y1="50" x2="52" y2="68" stroke="#8a8882" stroke-width="1.5"/>
+  <line x1="28" y1="50" x2="62" y2="50" stroke="#8a8882" stroke-width="1.5"/>
+  <text x="45" y="80" text-anchor="middle" font-size="7.5" fill="#55534f" font-family="DM Mono,monospace">pec stretch</text>
+</svg>`
+};
+
+// ════════════════════════════════════════════════════════════════
+// EXERCISE DATABASE
+// ════════════════════════════════════════════════════════════════
+const ALL_EXERCISES = [
+  {id:'chin-tuck',name:'Chin tuck',category:'Stabilization',seated:false,
+   instruction:'Draw your chin straight back — not down. Purely horizontal movement. Feel a gentle stretch at the base of the skull.',
+   cue:'Imagine a string pulling the back of your head toward the wall behind you.',
+   type:'hold',holdSec:10,repsPerSet:5,sets:3,restBetweenSets:20,restBetweenEx:25},
+
+  {id:'isometric',name:'Isometric neck hold',category:'Stabilization',seated:false,
+   instruction:'Palm against forehead. Push head gently into hand — do NOT let head move. Repeat all 4 directions: forward, back, left, right.',
+   cue:'Use only 30–40% of maximum effort. Heavy force is counterproductive.',
+   type:'hold',holdSec:8,repsPerSet:4,sets:3,restBetweenSets:25,restBetweenEx:30},
+
+  {id:'shoulder-squeeze',name:'Shoulder blade squeeze',category:'Mobility',seated:true,
+   instruction:'Pull shoulder blades together and slightly downward. Hold, then release fully. Keep shoulders away from your ears.',
+   cue:'Imagine holding a pencil between your shoulder blades.',
+   type:'hold',holdSec:5,repsPerSet:10,sets:3,restBetweenSets:20,restBetweenEx:25},
+
+  {id:'seated-rotation',name:'Seated neck rotation',category:'Mobility',seated:true,
+   instruction:'Sit tall. Slowly rotate head to look over one shoulder. Hold at comfortable end range. Return to centre and repeat other side.',
+   cue:'Never force the range. Work only within a pain-free zone.',
+   type:'hold',holdSec:5,repsPerSet:6,sets:3,restBetweenSets:15,restBetweenEx:20},
+
+  {id:'seated-flexion',name:'Seated neck flexion',category:'Mobility',seated:true,
+   instruction:'Sit upright. Slowly lower chin toward chest, feeling a stretch down the back of the neck. Hold 5 seconds, return slowly.',
+   cue:'Keep the movement smooth and gravity-assisted. No forcing.',
+   type:'hold',holdSec:5,repsPerSet:6,sets:2,restBetweenSets:15,restBetweenEx:20},
+
+  {id:'seated-side-bend',name:'Seated side bend',category:'Stretch',seated:true,
+   instruction:'Sit upright. Tilt one ear toward the same-side shoulder. Hold. You should feel a stretch on the opposite side of the neck.',
+   cue:'Use the opposite hand to anchor on the chair seat — this intensifies the stretch gently.',
+   type:'hold',holdSec:25,repsPerSet:2,sets:2,restBetweenSets:15,restBetweenEx:20},
+
+  {id:'seated-scapular',name:'Seated scapular retraction',category:'Posture',seated:true,
+   instruction:'Sit at edge of chair. Arms relaxed at sides. Pinch shoulder blades back and down. Hold. Release completely before next rep.',
+   cue:'Think: shoulders back AND down together. Not just back.',
+   type:'hold',holdSec:6,repsPerSet:8,sets:3,restBetweenSets:20,restBetweenEx:25},
+
+  {id:'bird-dog',name:'Bird-dog',category:'Stabilization',seated:false,
+   instruction:'On hands and knees. Extend right arm and left leg simultaneously. Keep hips level, neck neutral — eyes to floor. Switch sides.',
+   cue:'Move like water — slow, controlled. Each paired side counts as one rep.',
+   type:'hold',holdSec:5,repsPerSet:6,sets:3,restBetweenSets:30,restBetweenEx:30},
+
+  {id:'dead-bug',name:'Dead bug',category:'Stabilization',seated:false,
+   instruction:'Lie on back, arms pointing up, knees bent 90°. Press lower back to floor. Slowly lower right arm and extend left leg. Return, switch.',
+   cue:'If your lower back lifts off the floor, reduce your range of motion.',
+   type:'dynamic',setDuration:30,sets:3,restBetweenSets:30,restBetweenEx:30},
+
+  {id:'trap-stretch',name:'Upper trapezius stretch',category:'Stretch',seated:true,
+   instruction:'Sit upright, hold chair seat with right hand. Tilt left ear toward left shoulder. Use left hand to gently assist on top of the head.',
+   cue:'Gravity does most of the work. Do not pull hard. Breathe slowly through the stretch.',
+   type:'hold',holdSec:30,repsPerSet:2,sets:2,restBetweenSets:15,restBetweenEx:25},
+
+  {id:'levator-stretch',name:'Levator scapulae stretch',category:'Stretch',seated:true,
+   instruction:'Rotate head 45° to the left. Tilt chin toward your left armpit. Gently place left hand on back of head. Feel stretch on right side of neck.',
+   cue:'This targets the C3–C5 attachment point. Switch sides each rep.',
+   type:'hold',holdSec:30,repsPerSet:2,sets:2,restBetweenSets:15,restBetweenEx:25},
+
+  {id:'pec-stretch',name:'Pectoral stretch',category:'Stretch',seated:false,
+   instruction:'Stand in a doorway, forearm against the frame at 90°. Step forward until you feel a stretch across your chest and front shoulder.',
+   cue:'Keep head neutral — do not let it jut forward. Try different arm heights for variety.',
+   type:'hold',holdSec:30,repsPerSet:2,sets:2,restBetweenSets:15,restBetweenEx:25},
+
+  {id:'wall-angel',name:'Wall angels',category:'Posture',seated:false,
+   instruction:'Back, head and heels against wall. Arms at 90° like a goalpost. Slide arms up wall as high as comfortable, then return.',
+   cue:'If lower back lifts off the wall, step feet 5 cm forward.',
+   type:'dynamic',setDuration:40,sets:2,restBetweenSets:20,restBetweenEx:25},
+
+  {id:'doorway-stretch',name:'Doorway chest opener',category:'Stretch',seated:false,
+   instruction:'Arms raised to 90° against a door frame. Lean body gently forward. Feel the stretch across both pectorals and anterior shoulders.',
+   cue:'Breathe into the stretch. Keep chin tucked — don\'t crane your neck forward.',
+   type:'hold',holdSec:30,repsPerSet:3,sets:2,restBetweenSets:15,restBetweenEx:25},
+
+  {id:'nerve-glide',name:'Nerve glide (median)',category:'Mobility',seated:true,
+   instruction:'Sit upright. Tilt head away from symptomatic side. Extend arm out to side, palm forward. Gently flex then extend wrist rhythmically.',
+   cue:'STOP if tingling or shooting pain increases. This should feel like a gentle pull — not pain.',
+   type:'dynamic',setDuration:20,sets:3,restBetweenSets:30,restBetweenEx:30},
+];
+
+const CATEGORY_TAGS = {
+  Stabilization:'tag-stab',Stretch:'tag-stretch',
+  Mobility:'tag-mobility',Posture:'tag-posture'
+};
+
+const PREP_TIME = 5;
+
+function calcExTime(ex) {
+  const st = ex.type === 'hold' ? ex.holdSec * ex.repsPerSet : ex.setDuration;
+  return st * ex.sets + ex.restBetweenSets * (ex.sets - 1) + ex.restBetweenEx + PREP_TIME;
+}
+
+// ════════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════════
+let chosenMins = 5;
+let masterOrder = ALL_EXERCISES.map(e => e.id); // drag order
+let sessionPlan = [];
+let state = {
+  exIdx:0,setIdx:0,repIdx:0,phase:'prep',
+  phaseTime:PREP_TIME,phaseMax:PREP_TIME,
+  totalLeft:0,totalMax:0,ticker:null,paused:false,
+  setsCompleted:0,exCompleted:0,completedNames:[]
+};
+
+// ════════════════════════════════════════════════════════════════
+// SETUP
+// ════════════════════════════════════════════════════════════════
+function selectTime(m) {
+  chosenMins = m;
+  document.getElementById('btn5').classList.toggle('active', m===5);
+  document.getElementById('btn10').classList.toggle('active', m===10);
+  renderSetup();
+}
+
+function buildPlan(mins, order) {
+  const budget = mins * 60;
+  let plan = [], used = 0;
+  for (let id of order) {
+    const ex = ALL_EXERCISES.find(e => e.id === id);
+    if (!ex) continue;
+    const t = calcExTime(ex);
+    if (used + t <= budget - 5) { plan.push(ex); used += t; }
+  }
+  return plan;
+}
+
+function renderSetup() {
+  const p5 = buildPlan(5, masterOrder);
+  const p10 = buildPlan(10, masterOrder);
+  document.getElementById('count5').textContent = p5.length + ' exercises';
+  document.getElementById('count10').textContent = p10.length + ' exercises';
+
+  const plan = buildPlan(chosenMins, masterOrder);
+  const planIds = plan.map(e => e.id);
+  const el = document.getElementById('plan-preview');
+  el.innerHTML = '';
+
+  masterOrder.forEach((id, i) => {
+    const ex = ALL_EXERCISES.find(e => e.id === id);
+    if (!ex) return;
+    const inPlan = planIds.includes(id);
+    const meta = ex.type === 'hold'
+      ? `${ex.sets}×${ex.repsPerSet} reps · ${ex.holdSec}s`
+      : `${ex.sets}×${ex.setDuration}s`;
+    const item = document.createElement('div');
+    item.className = 'plan-item';
+    item.draggable = true;
+    item.dataset.id = id;
+    item.style.opacity = inPlan ? '1' : '0.4';
+    item.innerHTML = `
+      <div class="drag-handle" aria-label="drag"><span></span><span></span><span></span></div>
+      <span class="plan-num">${String(i+1).padStart(2,'0')}</span>
+      <span class="plan-name">${ex.name}</span>
+      ${ex.seated ? '<span class="plan-tag tag-seated" title="Can be done seated">seat</span>' : ''}
+      <span class="plan-tag ${CATEGORY_TAGS[ex.category]||'tag-stab'}">${ex.category.toLowerCase()}</span>
+      <span class="plan-meta">${meta}</span>
+      <button class="info-btn" title="How to do this exercise">?</button>`;
+    el.appendChild(item);
+    // attach after append so event is reliable
+    item.querySelector('.info-btn').addEventListener('click', e => { e.stopPropagation(); openModal(id, e); });
+  });
+
+  initDrag();
+}
+
+// ════════════════════════════════════════════════════════════════
+// DRAG & DROP — attaches to full item, pointer events, no cloneNode
+// ════════════════════════════════════════════════════════════════
+let dragState = null;
+
+function initDrag() {
+  document.querySelectorAll('.plan-item').forEach(item => {
+    item.addEventListener('mousedown', onItemMouseDown);
+    item.addEventListener('touchstart', onItemTouchStart, { passive: false });
+  });
+}
+
+function onItemMouseDown(e) {
+  if (e.target.closest('.info-btn')) return; // ignore info button clicks
+  e.preventDefault();
+  beginDrag(e.currentTarget, e.clientX, e.clientY);
+}
+
+function onItemTouchStart(e) {
+  if (e.target.closest('.info-btn')) return;
+  e.preventDefault();
+  const t = e.touches[0];
+  beginDrag(e.currentTarget, t.clientX, t.clientY);
+}
+
+function beginDrag(item, clientX, clientY) {
+  const list = document.getElementById('plan-preview');
+  const rect = item.getBoundingClientRect();
+
+  // Ghost element that follows cursor
+  const ghost = item.cloneNode(true);
+  ghost.style.cssText = `
+    position:fixed;
+    left:${rect.left}px;
+    top:${rect.top}px;
+    width:${rect.width}px;
+    height:${rect.height}px;
+    background:var(--surface2);
+    border:1.5px solid var(--green);
+    border-radius:var(--rs);
+    opacity:0.92;
+    z-index:9999;
+    pointer-events:none;
+    box-shadow:0 10px 30px rgba(0,0,0,0.6);
+    transition:none;
+  `;
+  document.body.appendChild(ghost);
+  item.classList.add('dragging');
+
+  dragState = {
+    item,
+    ghost,
+    list,
+    offsetY: clientY - rect.top,
+    offsetX: clientX - rect.left,
+  };
+
+  document.addEventListener('mousemove', onDragMove);
+  document.addEventListener('touchmove', onDragMove, { passive: false });
+  document.addEventListener('mouseup', onDragEnd);
+  document.addEventListener('touchend', onDragEnd);
+}
+
+function onDragMove(e) {
+  if (!dragState) return;
+  e.preventDefault();
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const { ghost, offsetY, offsetX, item, list } = dragState;
+
+  ghost.style.top  = (clientY - offsetY) + 'px';
+  ghost.style.left = (clientX - offsetX) + 'px';
+
+  // Find which item we're hovering over (skip the dragged item itself)
+  const ghostMidY = clientY - offsetY + ghost.offsetHeight / 2;
+  const siblings = [...list.querySelectorAll('.plan-item')].filter(i => i !== item);
+
+  let insertBefore = null;
+  for (const sib of siblings) {
+    const r = sib.getBoundingClientRect();
+    if (ghostMidY < r.top + r.height / 2) {
+      insertBefore = sib;
+      break;
+    }
+  }
+
+  if (insertBefore) {
+    list.insertBefore(item, insertBefore);
+  } else {
+    list.appendChild(item);
+  }
+}
+
+function onDragEnd() {
+  if (!dragState) return;
+  const { item, ghost, list } = dragState;
+
+  ghost.remove();
+  item.classList.remove('dragging');
+
+  // Sync order
+  masterOrder = [...list.querySelectorAll('.plan-item')].map(it => it.dataset.id);
+
+  // Re-number & re-opacity
+  const plan = buildPlan(chosenMins, masterOrder);
+  const planIds = plan.map(ex => ex.id);
+  [...list.querySelectorAll('.plan-item')].forEach((it, i) => {
+    it.querySelector('.plan-num').textContent = String(i + 1).padStart(2, '0');
+    it.style.opacity = planIds.includes(it.dataset.id) ? '1' : '0.4';
+  });
+  document.getElementById('count5').textContent  = buildPlan(5,  masterOrder).length + ' exercises';
+  document.getElementById('count10').textContent = buildPlan(10, masterOrder).length + ' exercises';
+
+  document.removeEventListener('mousemove', onDragMove);
+  document.removeEventListener('touchmove', onDragMove);
+  document.removeEventListener('mouseup',   onDragEnd);
+  document.removeEventListener('touchend',  onDragEnd);
+  dragState = null;
+}
+
+// ════════════════════════════════════════════════════════════════
+// SESSION
+// ════════════════════════════════════════════════════════════════
+function startSession() {
+  sessionPlan = buildPlan(chosenMins, masterOrder);
+  if (sessionPlan.length === 0) return;
+  state = {exIdx:0,setIdx:0,repIdx:0,phase:'prep',
+    phaseTime:PREP_TIME,phaseMax:PREP_TIME,
+    totalLeft:chosenMins*60,totalMax:chosenMins*60,
+    ticker:null,paused:false,setsCompleted:0,exCompleted:0,completedNames:[]};
+  showScreen('s-session');
+  enterPhase('prep');
+  renderQueue();
+}
+
+function enterPhase(type) {
+  const ex = sessionPlan[state.exIdx];
+  state.phase = type;
+  if (type==='prep') { state.phaseMax=PREP_TIME; state.phaseTime=PREP_TIME; }
+  else if (type==='work') {
+    const d = ex.type==='hold' ? ex.holdSec : ex.setDuration;
+    state.phaseMax=d; state.phaseTime=d;
+  }
+  else if (type==='rest') { state.phaseMax=ex.restBetweenSets; state.phaseTime=ex.restBetweenSets; }
+  else if (type==='between') {
+    const d = ex ? ex.restBetweenEx : 25;
+    state.phaseMax=d; state.phaseTime=d;
+  }
+  updateUI();
+  clearInterval(state.ticker);
+  state.ticker = setInterval(tick, 1000);
+}
+
+function tick() {
+  if (state.paused) return;
+  state.phaseTime--;
+  state.totalLeft = Math.max(0, state.totalLeft - 1);
+  updateUI();
+  if (state.phaseTime <= 0) { clearInterval(state.ticker); advance(); }
+}
+
+function advance() {
+  const ex = sessionPlan[state.exIdx];
+  if (!ex) { finishSession(); return; }
+  if (state.phase === 'prep') { state.repIdx=0; enterPhase('work'); }
+  else if (state.phase === 'work') {
+    if (ex.type==='hold') {
+      state.repIdx++;
+      if (state.repIdx < ex.repsPerSet) {
+        state.phaseTime=ex.holdSec; state.phaseMax=ex.holdSec;
+        updateUI();
+        clearInterval(state.ticker);
+        state.ticker=setInterval(tick,1000);
+        return;
+      }
+    }
+    state.setsCompleted++; state.setIdx++; state.repIdx=0;
+    if (state.setIdx < ex.sets) { enterPhase('rest'); }
+    else {
+      state.exCompleted++; state.completedNames.push(ex.name);
+      state.setIdx=0; state.exIdx++;
+      if (state.exIdx >= sessionPlan.length) finishSession();
+      else { enterPhase('between'); renderQueue(); }
+    }
+  }
+  else if (state.phase==='rest') enterPhase('work');
+  else if (state.phase==='between') enterPhase('prep');
+}
+
+function updateUI() {
+  const ex = sessionPlan[state.exIdx] || sessionPlan[sessionPlan.length-1];
+  if (!ex) return;
+  const m=Math.floor(state.totalLeft/60), s=state.totalLeft%60;
+  document.getElementById('total-time-disp').textContent = String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  document.getElementById('ex-progress-text').textContent = Math.min(state.exIdx+1,sessionPlan.length)+' / '+sessionPlan.length;
+  const pct=(state.totalMax-state.totalLeft)/state.totalMax*100;
+  document.getElementById('total-bar').style.width = Math.round(pct)+'%';
+
+  const pw = document.getElementById('phase-wrapper');
+  pw.className = 'phase-'+(state.phase==='between'?'between':state.phase);
+
+  const circumference = 2*Math.PI*33;
+  const offset = circumference*(1-state.phaseTime/state.phaseMax);
+  const ring = document.getElementById('ring-fill');
+  ring.style.strokeDasharray = circumference;
+  ring.style.strokeDashoffset = offset;
+  const colors={prep:'#60a5fa',work:'#4ade80',rest:'#fbbf24',between:'#fbbf24'};
+  ring.style.stroke = colors[state.phase]||'#4ade80';
+  document.getElementById('ring-num').textContent = state.phaseTime;
+
+  const phaseNames={prep:'Get ready',work:'Exercise',rest:'Rest',between:'Rest · next exercise'};
+  document.getElementById('phase-text').textContent = phaseNames[state.phase];
+
+  // illustration
+  const illustWrap = document.getElementById('illus-wrap');
+  const displayEx = (state.phase==='between' && sessionPlan[state.exIdx]) ? sessionPlan[state.exIdx] : ex;
+  if (ILLUS[displayEx.id]) illustWrap.innerHTML = ILLUS[displayEx.id];
+  else illustWrap.innerHTML = `<svg viewBox="0 0 90 90"><text x="45" y="50" text-anchor="middle" font-size="9" fill="#55534f" font-family="DM Mono,monospace">${displayEx.name}</text></svg>`;
+
+  if (state.phase==='between' && sessionPlan[state.exIdx]) {
+    const nex = sessionPlan[state.exIdx];
+    document.getElementById('ex-name-disp').textContent = 'Up next: '+nex.name;
+    document.getElementById('ex-instr-disp').textContent = nex.instruction;
+    document.getElementById('ex-cue-disp').style.display='none';
+  } else {
+    document.getElementById('ex-name-disp').textContent = ex.name;
+    document.getElementById('ex-instr-disp').textContent = ex.instruction;
+    const cueEl = document.getElementById('ex-cue-disp');
+    if (ex.cue && state.phase==='work') { cueEl.textContent=ex.cue; cueEl.style.display='block'; }
+    else cueEl.style.display='none';
+  }
+
+  const ringUnit = document.getElementById('ring-unit');
+  const repInfo = document.getElementById('rep-info');
+  const repCounter = document.getElementById('rep-counter');
+
+  if (state.phase==='work' && ex.type==='hold') {
+    ringUnit.textContent='hold';
+    repInfo.textContent = ex.repsPerSet+' reps · '+ex.holdSec+'s each';
+    repCounter.style.display='flex';
+    document.getElementById('rep-current').textContent = state.repIdx+1;
+    document.getElementById('rep-total').textContent = '/ '+ex.repsPerSet+' reps';
+  } else if (state.phase==='work') {
+    ringUnit.textContent='sec';
+    repInfo.textContent='Hold full duration';
+    repCounter.style.display='none';
+  } else if (state.phase==='rest') {
+    ringUnit.textContent='sec';
+    repInfo.textContent='Rest · next set incoming';
+    repCounter.style.display='none';
+  } else {
+    ringUnit.textContent='sec';
+    const e2 = state.phase==='between' ? (sessionPlan[state.exIdx]||ex) : ex;
+    repInfo.textContent = e2.type==='hold'
+      ? e2.sets+'×'+e2.repsPerSet+' reps · '+e2.holdSec+'s hold'
+      : e2.sets+'×'+e2.setDuration+'s';
+    repCounter.style.display='none';
+  }
+
+  let dots='';
+  const dotEx = state.phase==='between' ? null : ex;
+  if (dotEx) {
+    for (let i=0;i<dotEx.sets;i++) {
+      let cls='set-dot';
+      if (i<state.setIdx) cls+=' done';
+      else if (i===state.setIdx && (state.phase==='work'||state.phase==='rest')) cls+=' active';
+      dots+=`<div class="${cls}"></div>`;
+    }
+  }
+  document.getElementById('set-dots').innerHTML=dots;
+  const setLbls={work:`Set ${state.setIdx+1} of ${ex.sets}`,rest:`Resting · set ${state.setIdx+1}/${ex.sets}`,prep:`Set 1 of ${ex.sets}`,between:''};
+  document.getElementById('set-label').textContent = setLbls[state.phase]||'';
+
+  const nextEx = sessionPlan[state.exIdx+(state.phase==='between'?0:1)];
+  const nextEl = document.getElementById('next-preview');
+  if (nextEx && state.phase!=='between') {
+    document.getElementById('next-name').textContent = nextEx.name;
+    nextEl.style.display='flex';
+  } else nextEl.style.display='none';
+}
+
+function renderQueue() {
+  const el = document.getElementById('queue-list');
+  el.innerHTML = sessionPlan.map((ex,i) => {
+    if (i<state.exIdx) return `<div class="queue-item completed"><div class="q-check">✓</div><span class="q-name">${ex.name}</span></div>`;
+    if (i===state.exIdx) {
+      const m=ex.type==='hold'?ex.sets+'×'+ex.repsPerSet:ex.sets+'×'+ex.setDuration+'s';
+      return `<div class="queue-item current"><span class="q-num">${i+1}</span><span class="q-name">${ex.name}</span><span class="q-meta">${m}</span></div>`;
+    }
+    const m=ex.type==='hold'?ex.sets+'×'+ex.repsPerSet:ex.sets+'×'+ex.setDuration+'s';
+    return `<div class="queue-item upcoming"><span class="q-num">${i+1}</span><span class="q-name">${ex.name}</span><span class="q-meta">${m}</span></div>`;
+  }).join('');
+}
+
+function togglePause() {
+  state.paused=!state.paused;
+  const btn=document.getElementById('pause-btn');
+  const lbl=document.getElementById('pause-label');
+  const icon=document.getElementById('pause-icon');
+  if (state.paused) {
+    btn.classList.add('pause-active'); lbl.textContent='Resume';
+    icon.innerHTML='<polygon points="5 3 19 12 5 21 5 3"/>';
+  } else {
+    btn.classList.remove('pause-active'); lbl.textContent='Pause';
+    icon.innerHTML='<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+  }
+}
+
+function skipPhase() { clearInterval(state.ticker); state.phaseTime=0; advance(); }
+
+function endSession() { clearInterval(state.ticker); showDone(); }
+function finishSession() { clearInterval(state.ticker); showDone(); }
+
+function showDone() {
+  const elapsed=state.totalMax-state.totalLeft;
+  const m=Math.floor(elapsed/60),s=elapsed%60;
+  document.getElementById('done-time').textContent = String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+  document.getElementById('done-ex').textContent = state.exCompleted;
+  document.getElementById('done-sets').textContent = state.setsCompleted;
+  document.getElementById('done-ex-list-inner').innerHTML = state.completedNames.length
+    ? state.completedNames.map(n=>`<div class="done-ex-item"><span style="color:var(--green)">✓</span> ${n}</div>`).join('')
+    : '<div class="done-ex-item" style="color:var(--text3)">No exercises completed</div>';
+  showScreen('s-done');
+}
+
+function resetApp() {
+  clearInterval(state.ticker);
+  showScreen('s-setup');
+  renderSetup();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ════════════════════════════════════════════════════════════════
+// EXERCISE INFO MODAL
+// ════════════════════════════════════════════════════════════════
+function openModal(id, event) {
+  if (event) { event.stopPropagation(); event.preventDefault(); }
+  const ex = ALL_EXERCISES.find(e => e.id === id);
+  if (!ex) return;
+
+  const illusEl = document.getElementById('modal-illus');
+  illusEl.innerHTML = ILLUS[id]
+    ? ILLUS[id]
+    : `<svg viewBox="0 0 90 90"><text x="45" y="50" text-anchor="middle" font-size="8" fill="#55534f" font-family="DM Mono,monospace">${ex.name}</text></svg>`;
+
+  document.getElementById('modal-name').textContent = ex.name;
+  const tagHTML = [
+    ex.seated ? `<span class="plan-tag tag-seated">seated ok</span>` : '',
+    `<span class="plan-tag ${CATEGORY_TAGS[ex.category]||'tag-stab'}">${ex.category.toLowerCase()}</span>`
+  ].join('');
+  document.getElementById('modal-tags').innerHTML = tagHTML;
+
+  let statsHTML = '';
+  if (ex.type === 'hold') {
+    statsHTML = `
+      <div class="modal-stat"><span class="modal-stat-val">${ex.sets}</span><span class="modal-stat-lbl">sets</span></div>
+      <div class="modal-stat"><span class="modal-stat-val">${ex.repsPerSet}</span><span class="modal-stat-lbl">reps / set</span></div>
+      <div class="modal-stat"><span class="modal-stat-val">${ex.holdSec}s</span><span class="modal-stat-lbl">hold each</span></div>`;
+  } else {
+    statsHTML = `
+      <div class="modal-stat"><span class="modal-stat-val">${ex.sets}</span><span class="modal-stat-lbl">sets</span></div>
+      <div class="modal-stat"><span class="modal-stat-val">${ex.setDuration}s</span><span class="modal-stat-lbl">per set</span></div>
+      <div class="modal-stat"><span class="modal-stat-val">${ex.restBetweenSets}s</span><span class="modal-stat-lbl">rest</span></div>`;
+  }
+  document.getElementById('modal-stats').innerHTML = statsHTML;
+
+  document.getElementById('modal-instr').textContent = ex.instruction;
+  if (ex.cue) {
+    document.getElementById('modal-cue').textContent = ex.cue;
+    document.getElementById('modal-cue-wrap').style.display = 'block';
+  } else {
+    document.getElementById('modal-cue-wrap').style.display = 'none';
+  }
+
+  document.getElementById('modal-overlay').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(event) {
+  if (event && event.target !== document.getElementById('modal-overlay')) return;
+  document.getElementById('modal-overlay').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+renderSetup();
+</script>
+</body>
+</html>
