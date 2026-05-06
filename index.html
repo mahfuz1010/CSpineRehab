@@ -69,12 +69,9 @@ body.high-contrast{
 
 /* drag list */
 .plan-list{display:flex;flex-direction:column;gap:5px;margin-bottom:2rem}
-.plan-item{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);cursor:grab;user-select:none;transition:border-color .15s,background .15s;touch-action:pan-y}
-.plan-item:active{cursor:grabbing}
-.plan-item.drag-over{border-color:var(--green);background:var(--green-dim)}
-.plan-item.dragging{opacity:.2 !important;cursor:grabbing}
-.drag-handle{color:var(--text3);font-size:14px;display:flex;flex-direction:column;gap:3px;flex-shrink:0;padding:8px 4px;cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent}
-.drag-handle span{display:block;width:14px;height:2px;background:currentColor;border-radius:2px}
+.plan-item{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);cursor:pointer;user-select:none;transition:border-color .15s,background .15s,opacity .15s}
+.plan-item:hover{border-color:var(--border2);background:var(--surface2)}
+.plan-item.selected{border-color:var(--green);background:var(--green-dim)}
 .plan-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);min-width:20px}
 .plan-check{width:16px;height:16px;accent-color:#4ade80;cursor:pointer;flex-shrink:0}
 .plan-name{font-size:13px;color:var(--text);flex:1}
@@ -86,7 +83,7 @@ body.high-contrast{
 .tag-seated{background:rgba(251,113,133,.1);color:#fb7185}
 .plan-meta{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);white-space:nowrap}
 .plan-note{font-size:11px;color:var(--text3);text-align:center;margin-bottom:1.5rem;line-height:1.6}
-.selected-summary{font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);margin:-.5rem 0 1.5rem}
+.selected-summary{font-family:'DM Mono',monospace;font-size:15px;color:var(--text);margin:-.5rem 0 1.5rem;padding:.75rem 1rem;background:var(--surface);border:1px solid var(--border2);border-radius:var(--rs);letter-spacing:.02em}
 .analytics-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.75rem .9rem;margin:-.5rem 0 1.5rem}
 .analytics-row{display:flex;justify-content:space-between;gap:8px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text2)}
 
@@ -308,7 +305,6 @@ body.large-text .modal-instr{font-size:16px}
   </div>
   <h1 class="setup-title">Your session<br>starts here.</h1>
   <p class="setup-sub" id="setup-sub">Guided routine for C5/C6/C7 disc herniation. Drag to reorder exercises. Clinically-appropriate timing for each movement.</p>
-  <div class="selected-summary" id="selected-summary">selected: 00:00 · 0 exercises</div>
   <div class="analytics-box">
     <div class="analytics-row"><span>sessions</span><span id="analytics-sessions">0</span></div>
     <div class="analytics-row"><span>total minutes</span><span id="analytics-minutes">0</span></div>
@@ -330,10 +326,11 @@ body.large-text .modal-instr{font-size:16px}
       <div class="mins-count" id="count15">loading...</div>
     </button>
   </div>
+  <div class="selected-summary" id="selected-summary">selected: 00:00 · 0 exercises</div>
 
-  <div class="section-label">Exercise order — drag to rearrange</div>
+  <div class="section-label">Exercises — tap to select</div>
   <div class="plan-list" id="plan-preview"></div>
-  <p class="plan-note">Tap a duration to randomize a starting set. Check or uncheck any exercise, then drag to reorder.</p>
+  <p class="plan-note">Tap a duration to randomize a starting set. Tap any exercise to select or deselect it.</p>
   <button class="start-btn" onclick="startSession()">Begin session →</button>
 </div>
 
@@ -1091,7 +1088,7 @@ const PREP_TIME = 7;
 const PROGRAMS = {
   cspine: {
     name: 'Cervical spine',
-    subtitle: 'Guided routine for C5/C6/C7 disc herniation. Drag to reorder exercises. Clinically-appropriate timing for each movement.',
+    subtitle: 'Guided routine for C5/C6/C7 disc herniation.',
     exercises: CSPINE_EXERCISES
   },
   lowerback: {
@@ -1616,7 +1613,12 @@ function updateSelectedSummary() {
 function onExerciseToggle(id, checked) {
   if (checked) selectedIds.add(id);
   else selectedIds.delete(id);
-  renderSetup();
+  const item = document.querySelector(`.plan-item[data-id="${id}"]`);
+  if (item) {
+    item.classList.toggle('selected', checked);
+    item.style.opacity = checked ? '1' : '0.4';
+  }
+  updateSelectedSummary();
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -1675,146 +1677,23 @@ function renderSetup() {
       ? `${ex.sets}×${ex.repsPerSet} reps · ${ex.holdSec}s`
       : `${ex.sets}×${ex.setDuration}s`;
     const item = document.createElement('div');
-    item.className = 'plan-item';
-    item.draggable = true;
+    item.className = 'plan-item' + (inPlan ? ' selected' : '');
     item.dataset.id = id;
     item.style.opacity = inPlan ? '1' : '0.4';
     item.innerHTML = `
-      <div class="drag-handle" aria-label="drag"><span></span><span></span><span></span></div>
       <span class="plan-num">${String(i+1).padStart(2,'0')}</span>
-      <input class="plan-check" type="checkbox" ${inPlan ? 'checked' : ''} aria-label="Select ${ex.name}">
       <span class="plan-name">${ex.name}</span>
       ${ex.seated ? '<span class="plan-tag tag-seated" title="Can be done seated">seat</span>' : ''}
       <span class="plan-tag ${CATEGORY_TAGS[ex.category]||'tag-stab'}">${ex.category.toLowerCase()}</span>
       <span class="plan-meta">${meta}</span>
       <button class="info-btn" title="How to do this exercise">?</button>`;
     el.appendChild(item);
-    // attach after append so event is reliable
     item.querySelector('.info-btn').addEventListener('click', e => { e.stopPropagation(); openModal(id, e); });
-    item.querySelector('.plan-check').addEventListener('change', e => {
-      onExerciseToggle(id, e.target.checked);
+    item.addEventListener('click', e => {
+      if (e.target.closest('.info-btn')) return;
+      onExerciseToggle(id, !selectedIds.has(id));
     });
   });
-
-  initDrag();
-}
-
-// ════════════════════════════════════════════════════════════════
-// DRAG & DROP — attaches to full item, pointer events, no cloneNode
-// ════════════════════════════════════════════════════════════════
-let dragState = null;
-
-function initDrag() {
-  document.querySelectorAll('.plan-item').forEach(item => {
-    item.addEventListener('mousedown', onItemMouseDown);
-    item.addEventListener('touchstart', onItemTouchStart, { passive: false });
-  });
-}
-
-function onItemMouseDown(e) {
-  if (e.target.closest('.info-btn') || e.target.closest('.plan-check')) return;
-  e.preventDefault();
-  beginDrag(e.currentTarget, e.clientX, e.clientY);
-}
-
-function onItemTouchStart(e) {
-  if (e.target.closest('.info-btn') || e.target.closest('.plan-check')) return;
-  if (!e.target.closest('.drag-handle')) return; // only drag from handle on touch; allow normal scroll elsewhere
-  e.preventDefault();
-  const t = e.touches[0];
-  beginDrag(e.currentTarget, t.clientX, t.clientY);
-}
-
-function beginDrag(item, clientX, clientY) {
-  const list = document.getElementById('plan-preview');
-  const rect = item.getBoundingClientRect();
-
-  // Ghost element that follows cursor
-  const ghost = item.cloneNode(true);
-  ghost.style.cssText = `
-    position:fixed;
-    left:${rect.left}px;
-    top:${rect.top}px;
-    width:${rect.width}px;
-    height:${rect.height}px;
-    background:var(--surface2);
-    border:1.5px solid var(--green);
-    border-radius:var(--rs);
-    opacity:0.92;
-    z-index:9999;
-    pointer-events:none;
-    box-shadow:0 10px 30px rgba(0,0,0,0.6);
-    transition:none;
-  `;
-  document.body.appendChild(ghost);
-  item.classList.add('dragging');
-
-  dragState = {
-    item,
-    ghost,
-    list,
-    offsetY: clientY - rect.top,
-    offsetX: clientX - rect.left,
-  };
-
-  document.addEventListener('mousemove', onDragMove);
-  document.addEventListener('touchmove', onDragMove, { passive: false });
-  document.addEventListener('mouseup', onDragEnd);
-  document.addEventListener('touchend', onDragEnd);
-}
-
-function onDragMove(e) {
-  if (!dragState) return;
-  e.preventDefault();
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const { ghost, offsetY, offsetX, item, list } = dragState;
-
-  ghost.style.top  = (clientY - offsetY) + 'px';
-  ghost.style.left = (clientX - offsetX) + 'px';
-
-  // Find which item we're hovering over (skip the dragged item itself)
-  const ghostMidY = clientY - offsetY + ghost.offsetHeight / 2;
-  const siblings = [...list.querySelectorAll('.plan-item')].filter(i => i !== item);
-
-  let insertBefore = null;
-  for (const sib of siblings) {
-    const r = sib.getBoundingClientRect();
-    if (ghostMidY < r.top + r.height / 2) {
-      insertBefore = sib;
-      break;
-    }
-  }
-
-  if (insertBefore) {
-    list.insertBefore(item, insertBefore);
-  } else {
-    list.appendChild(item);
-  }
-}
-
-function onDragEnd() {
-  if (!dragState) return;
-  const { item, ghost, list } = dragState;
-
-  ghost.remove();
-  item.classList.remove('dragging');
-
-  // Sync order
-  masterOrder = [...list.querySelectorAll('.plan-item')].map(it => it.dataset.id);
-
-  // Re-number & re-opacity
-  [...list.querySelectorAll('.plan-item')].forEach((it, i) => {
-    it.querySelector('.plan-num').textContent = String(i + 1).padStart(2, '0');
-    it.style.opacity = selectedIds.has(it.dataset.id) ? '1' : '0.4';
-  });
-  updateSelectedSummary();
-
-  document.removeEventListener('mousemove', onDragMove);
-  document.removeEventListener('touchmove', onDragMove);
-  document.removeEventListener('mouseup',   onDragEnd);
-  document.removeEventListener('touchend',  onDragEnd);
-  dragState = null;
 }
 
 // ════════════════════════════════════════════════════════════════
