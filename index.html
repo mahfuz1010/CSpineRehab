@@ -31,7 +31,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .setup-title{font-family:'Instrument Serif',serif;font-size:36px;line-height:1.15;margin-bottom:.4rem}
 .setup-sub{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:2rem}
 .section-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
-.time-selector{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:2rem}
+.time-selector{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:2rem}
 .time-btn{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1rem;cursor:pointer;transition:all .2s;text-align:left}
 .time-btn:hover{border-color:var(--border2);background:var(--surface2)}
 .time-btn.active{border-color:var(--green);background:var(--green-dim)}
@@ -42,11 +42,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 
 /* drag list */
 .plan-list{display:flex;flex-direction:column;gap:5px;margin-bottom:2rem}
-.plan-item{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);cursor:grab;user-select:none;transition:border-color .15s,background .15s;touch-action:none}
+.plan-item{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);cursor:grab;user-select:none;transition:border-color .15s,background .15s;touch-action:pan-y}
 .plan-item:active{cursor:grabbing}
 .plan-item.drag-over{border-color:var(--green);background:var(--green-dim)}
 .plan-item.dragging{opacity:.2 !important;cursor:grabbing}
-.drag-handle{color:var(--text3);font-size:14px;display:flex;flex-direction:column;gap:3px;flex-shrink:0;padding:4px 2px;cursor:grab}
+.drag-handle{color:var(--text3);font-size:14px;display:flex;flex-direction:column;gap:3px;flex-shrink:0;padding:8px 4px;cursor:grab;touch-action:none;-webkit-tap-highlight-color:transparent}
 .drag-handle span{display:block;width:14px;height:2px;background:currentColor;border-radius:2px}
 .plan-num{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);min-width:20px}
 .plan-name{font-size:13px;color:var(--text);flex:1}
@@ -180,6 +180,30 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .modal-stat-lbl{font-size:10px;color:var(--text3);display:block;margin-top:3px}
 .modal-close{width:100%;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);color:var(--text2);font-family:'DM Sans',sans-serif;font-size:14px;cursor:pointer;transition:all .2s;margin-top:.5rem}
 .modal-close:hover{background:var(--surface3);color:var(--text)}
+
+/* ── MOBILE ── */
+@media (max-width:480px){
+  body{padding:1.25rem .75rem 4rem}
+  .setup-title{font-size:30px}
+  .time-selector{gap:6px}
+  .time-btn{padding:.75rem .5rem}
+  .time-btn .mins{font-size:22px}
+  .plan-meta{display:none}
+  .plan-item{gap:6px;padding:9px 10px}
+  .plan-name{font-size:12px}
+  .illus-wrap{width:88px;height:88px}
+  .illus-wrap svg{width:72px;height:72px}
+  .ex-name{font-size:19px}
+  .ctrl-btn{padding:12px 6px;font-size:12px}
+  .ring-number{font-size:18px}
+  .card-body{gap:.75rem}
+  .modal-sheet{padding:1.25rem 1rem 2rem}
+}
+@media (max-width:360px){
+  .plan-tag{display:none}
+  .tag-seated{display:none}
+  .info-btn{width:30px;height:30px}
+}
 </style>
 </head>
 <body>
@@ -200,6 +224,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <button class="time-btn" id="btn10" onclick="selectTime(10)">
       <span class="mins">10</span><span class="mins-label">minutes</span>
       <div class="mins-count" id="count10">loading...</div>
+    </button>
+    <button class="time-btn" id="btn15" onclick="selectTime(15)">
+      <span class="mins">15</span><span class="mins-label">minutes</span>
+      <div class="mins-count" id="count15">loading...</div>
     </button>
   </div>
 
@@ -757,6 +785,7 @@ function selectTime(m) {
   chosenMins = m;
   document.getElementById('btn5').classList.toggle('active', m===5);
   document.getElementById('btn10').classList.toggle('active', m===10);
+  document.getElementById('btn15').classList.toggle('active', m===15);
   renderSetup();
 }
 
@@ -775,8 +804,10 @@ function buildPlan(mins, order) {
 function renderSetup() {
   const p5 = buildPlan(5, masterOrder);
   const p10 = buildPlan(10, masterOrder);
+  const p15 = buildPlan(15, masterOrder);
   document.getElementById('count5').textContent = p5.length + ' exercises';
   document.getElementById('count10').textContent = p10.length + ' exercises';
+  document.getElementById('count15').textContent = p15.length + ' exercises';
 
   const plan = buildPlan(chosenMins, masterOrder);
   const planIds = plan.map(e => e.id);
@@ -831,6 +862,7 @@ function onItemMouseDown(e) {
 
 function onItemTouchStart(e) {
   if (e.target.closest('.info-btn')) return;
+  if (!e.target.closest('.drag-handle')) return; // only drag from handle on touch; allow normal scroll elsewhere
   e.preventDefault();
   const t = e.touches[0];
   beginDrag(e.currentTarget, t.clientX, t.clientY);
@@ -923,6 +955,7 @@ function onDragEnd() {
   });
   document.getElementById('count5').textContent  = buildPlan(5,  masterOrder).length + ' exercises';
   document.getElementById('count10').textContent = buildPlan(10, masterOrder).length + ' exercises';
+  document.getElementById('count15').textContent = buildPlan(15, masterOrder).length + ' exercises';
 
   document.removeEventListener('mousemove', onDragMove);
   document.removeEventListener('touchmove', onDragMove);
