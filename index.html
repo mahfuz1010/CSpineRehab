@@ -22,6 +22,11 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem 5rem}
 .app{width:100%;max-width:540px}
+.app-topbar{display:flex;justify-content:flex-end;margin-bottom:1rem}
+.sound-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:999px;color:var(--text2);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.sound-btn:hover{border-color:var(--border2);background:var(--surface2);color:var(--text)}
+.sound-btn svg{width:14px;height:14px;flex-shrink:0}
+.sound-btn.off{color:var(--amber);border-color:rgba(251,191,36,.25);background:var(--amber-dim)}
 .screen{display:none;animation:fadeIn 0.3s ease}
 .screen.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -185,6 +190,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 @media (max-width:480px){
   body{padding:1.25rem .75rem 4rem}
   .setup-title{font-size:30px}
+  .app-topbar{margin-bottom:.75rem}
+  .sound-btn{padding:8px 10px;font-size:10px}
   .time-selector{gap:6px}
   .time-btn{padding:.75rem .5rem}
   .time-btn .mins{font-size:22px}
@@ -208,6 +215,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 </head>
 <body>
 <div class="app">
+
+<div class="app-topbar">
+  <button class="sound-btn" id="sound-btn" onclick="toggleSound()" aria-pressed="true" title="Toggle timer sounds">
+    <svg id="sound-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg>
+    <span id="sound-label">Sound on</span>
+  </button>
+</div>
 
 <!-- SETUP -->
 <div id="s-setup" class="screen active">
@@ -771,12 +785,101 @@ function calcExTime(ex) {
 let chosenMins = 5;
 let masterOrder = ALL_EXERCISES.map(e => e.id); // drag order
 let sessionPlan = [];
+let audioCtx = null;
+let soundEnabled = true;
 let state = {
   exIdx:0,setIdx:0,repIdx:0,phase:'prep',
   phaseTime:PREP_TIME,phaseMax:PREP_TIME,
   totalLeft:0,totalMax:0,ticker:null,paused:false,
   setsCompleted:0,exCompleted:0,completedNames:[]
 };
+
+function updateSoundButton() {
+  const btn = document.getElementById('sound-btn');
+  const label = document.getElementById('sound-label');
+  const icon = document.getElementById('sound-icon');
+  if (!btn || !label || !icon) return;
+
+  btn.classList.toggle('off', !soundEnabled);
+  btn.setAttribute('aria-pressed', String(soundEnabled));
+  label.textContent = soundEnabled ? 'Sound on' : 'Sound off';
+  icon.innerHTML = soundEnabled
+    ? '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path>'
+    : '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>';
+}
+
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  updateSoundButton();
+  if (soundEnabled) ensureAudioContext();
+}
+
+function ensureAudioContext() {
+  if (!window.AudioContext && !window.webkitAudioContext) return null;
+  if (!audioCtx) {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    audioCtx = new AudioCtx();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+function playToneSequence(notes, waveType = 'sine') {
+  if (!soundEnabled) return;
+  const ctx = ensureAudioContext();
+  if (!ctx) return;
+
+  const startAt = ctx.currentTime + 0.01;
+  notes.forEach((note, index) => {
+    const toneStart = startAt + index * note.gap;
+    const oscillator = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    oscillator.type = note.wave || waveType;
+    oscillator.frequency.setValueAtTime(note.freq, toneStart);
+
+    gain.gain.setValueAtTime(0.0001, toneStart);
+    gain.gain.exponentialRampToValueAtTime(note.volume, toneStart + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.0001, toneStart + note.duration);
+
+    oscillator.connect(gain);
+    gain.connect(ctx.destination);
+
+    oscillator.start(toneStart);
+    oscillator.stop(toneStart + note.duration + 0.02);
+  });
+}
+
+function playTimerStartSound() {
+  playToneSequence([
+    { freq: 740, duration: 0.09, gap: 0.14, volume: 0.03, wave: 'triangle' },
+    { freq: 988, duration: 0.12, gap: 0.14, volume: 0.026, wave: 'triangle' }
+  ], 'triangle');
+}
+
+function playBreakStartSound() {
+  playToneSequence([
+    { freq: 523, duration: 0.08, gap: 0.11, volume: 0.028, wave: 'square' },
+    { freq: 659, duration: 0.08, gap: 0.11, volume: 0.024, wave: 'square' },
+    { freq: 523, duration: 0.15, gap: 0.11, volume: 0.022, wave: 'square' }
+  ], 'square');
+}
+
+function playTimerEndSound() {
+  playToneSequence([
+    { freq: 1047, duration: 0.06, gap: 0.1, volume: 0.032, wave: 'sine' },
+    { freq: 784, duration: 0.08, gap: 0.1, volume: 0.03, wave: 'sine' },
+    { freq: 440, duration: 0.18, gap: 0.1, volume: 0.028, wave: 'sine' }
+  ], 'sine');
+}
+
+function playPhaseStartSound(type) {
+  if (type === 'rest' || type === 'between') {
+    playBreakStartSound();
+    return;
+  }
+  playTimerStartSound();
+}
 
 // ════════════════════════════════════════════════════════════════
 // SETUP
@@ -970,6 +1073,7 @@ function onDragEnd() {
 function startSession() {
   sessionPlan = buildPlan(chosenMins, masterOrder);
   if (sessionPlan.length === 0) return;
+  ensureAudioContext();
   state = {exIdx:0,setIdx:0,repIdx:0,phase:'prep',
     phaseTime:PREP_TIME,phaseMax:PREP_TIME,
     totalLeft:chosenMins*60,totalMax:chosenMins*60,
@@ -994,6 +1098,7 @@ function enterPhase(type) {
   }
   updateUI();
   clearInterval(state.ticker);
+  playPhaseStartSound(type);
   state.ticker = setInterval(tick, 1000);
 }
 
@@ -1002,7 +1107,11 @@ function tick() {
   state.phaseTime--;
   state.totalLeft = Math.max(0, state.totalLeft - 1);
   updateUI();
-  if (state.phaseTime <= 0) { clearInterval(state.ticker); advance(); }
+  if (state.phaseTime <= 0) {
+    clearInterval(state.ticker);
+    playTimerEndSound();
+    advance();
+  }
 }
 
 function advance() {
@@ -1233,6 +1342,7 @@ function closeModal(event) {
 }
 
 renderSetup();
+updateSoundButton();
 </script>
 </body>
 </html>
