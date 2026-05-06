@@ -317,7 +317,7 @@ body.large-text .modal-instr{font-size:16px}
 
   <div class="section-label">Session length</div>
   <div class="time-selector">
-    <button class="time-btn active" id="btn5" onclick="selectTime(5)">
+    <button class="time-btn" id="btn5" onclick="selectTime(5)">
       <span class="mins">5</span><span class="mins-label">minutes</span>
       <div class="mins-count" id="count5">loading...</div>
     </button>
@@ -1115,7 +1115,7 @@ function calcExTime(ex) {
 // ════════════════════════════════════════════════════════════════
 // STATE
 // ════════════════════════════════════════════════════════════════
-let chosenMins = 5;
+let chosenMins = null;
 let masterOrder = getCurrentExercises().map(e => e.id); // drag order
 let sessionPlan = [];
 let selectedIds = new Set();
@@ -1641,7 +1641,10 @@ function switchProgram(programKey) {
 
   masterOrder = getCurrentExercises().map(e => e.id);
   selectedIds = new Set();
-  applyRandomPreset(chosenMins);
+  chosenMins = null;
+  document.getElementById('btn5').classList.remove('active');
+  document.getElementById('btn10').classList.remove('active');
+  document.getElementById('btn15').classList.remove('active');
   renderSetup();
 }
 
@@ -2163,7 +2166,6 @@ function initializeMobileAudio() {
 
 loadPreferences();
 applyA11yClasses();
-applyRandomPreset(chosenMins);
 loadAnalytics();
 initializeMobileAudio();
 renderSetup();
