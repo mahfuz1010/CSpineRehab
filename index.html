@@ -21,12 +21,30 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:2rem 1rem 5rem}
+body.high-contrast{
+  --bg:#000000;--surface:#090909;--surface2:#111111;--surface3:#1a1a1a;
+  --border:rgba(255,255,255,0.85);--border2:#ffffff;
+  --text:#ffffff;--text2:#f3f4f6;--text3:#d1d5db;
+  --green:#34ff8a;--green-dim:rgba(52,255,138,0.18);
+  --amber:#ffd84d;--amber-dim:rgba(255,216,77,0.2);
+  --blue:#7cc4ff;--blue-dim:rgba(124,196,255,0.2);
+  --red:#ff8a8a;--red-dim:rgba(255,138,138,0.2);
+}
 .app{width:100%;max-width:540px}
-.app-topbar{display:flex;justify-content:flex-end;margin-bottom:1rem}
+.app-topbar{display:flex;flex-direction:column;gap:8px;margin-bottom:1rem}
+.topbar-group{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.topbar-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--text3);min-width:88px}
 .sound-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:999px;color:var(--text2);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s}
 .sound-btn:hover{border-color:var(--border2);background:var(--surface2);color:var(--text)}
 .sound-btn svg{width:14px;height:14px;flex-shrink:0}
 .sound-btn.off{color:var(--amber);border-color:rgba(251,191,36,.25);background:var(--amber-dim)}
+.wake-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:999px;color:var(--text2);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.wake-btn:hover{border-color:var(--border2);background:var(--surface2);color:var(--text)}
+.wake-btn svg{width:14px;height:14px;flex-shrink:0}
+.wake-btn.active{color:var(--green);border-color:rgba(74,222,128,.3);background:var(--green-dim)}
+.a11y-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;background:var(--surface);border:1px solid var(--border);border-radius:999px;color:var(--text2);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.a11y-btn:hover{border-color:var(--border2);background:var(--surface2);color:var(--text)}
+.a11y-btn.active{color:var(--blue);border-color:rgba(96,165,250,.35);background:var(--blue-dim)}
 .screen{display:none;animation:fadeIn 0.3s ease}
 .screen.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -35,6 +53,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .logo{font-family:'Instrument Serif',serif;font-style:italic;font-size:13px;color:var(--text3);letter-spacing:.05em;margin-bottom:2.5rem;padding-top:.5rem}
 .setup-title{font-family:'Instrument Serif',serif;font-size:36px;line-height:1.15;margin-bottom:.4rem}
 .setup-sub{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:2rem}
+.program-tabs{display:flex;gap:8px;margin-bottom:1rem}
+.program-tab{flex:1;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);color:var(--text2);font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.program-tab:hover{border-color:var(--border2);background:var(--surface2);color:var(--text)}
+.program-tab.active{border-color:var(--blue);background:var(--blue-dim);color:var(--blue)}
 .section-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:10px}
 .time-selector{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:2rem}
 .time-btn{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:1rem;cursor:pointer;transition:all .2s;text-align:left}
@@ -65,6 +87,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .plan-meta{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);white-space:nowrap}
 .plan-note{font-size:11px;color:var(--text3);text-align:center;margin-bottom:1.5rem;line-height:1.6}
 .selected-summary{font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);margin:-.5rem 0 1.5rem}
+.analytics-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:.75rem .9rem;margin:-.5rem 0 1.5rem}
+.analytics-row{display:flex;justify-content:space-between;gap:8px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text2)}
 
 .start-btn{width:100%;padding:16px;background:var(--green);color:#0a1a0f;border:none;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;transition:all .2s;letter-spacing:.01em}
 .start-btn:hover{background:#6ee7a0;transform:translateY(-1px)}
@@ -104,6 +128,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .ex-name{font-family:'Instrument Serif',serif;font-size:22px;color:var(--text);margin-bottom:4px;line-height:1.2}
 .ex-instruction{font-size:12px;color:var(--text2);line-height:1.65}
 .ex-cue{font-size:11px;color:var(--green);background:var(--green-dim);border-radius:var(--rs);padding:7px 10px;margin-top:.75rem;font-style:italic;line-height:1.5}
+.quality-card{margin-top:.7rem;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rs);padding:.65rem .75rem}
+.quality-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);margin-bottom:6px}
+.quality-list{margin:0 0 6px 16px;padding:0;color:var(--text);font-size:11px;line-height:1.5}
+.quality-list li{margin:0 0 2px}
+.quality-mistake{font-size:10px;color:var(--amber);background:var(--amber-dim);border-radius:6px;padding:5px 7px;line-height:1.4}
 
 /* timer row */
 .timer-row{display:flex;align-items:center;gap:1rem;padding-top:.75rem;border-top:1px solid var(--border)}
@@ -124,6 +153,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .rep-counter{display:flex;align-items:baseline;gap:5px;margin-top:3px}
 .rep-num{font-family:'DM Mono',monospace;font-size:16px;color:var(--text);font-weight:500}
 .rep-total{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3)}
+.side-counter{display:none;font-family:'DM Mono',monospace;font-size:10px;color:var(--text2);margin-top:4px}
 
 .next-preview{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;margin-bottom:1rem;display:flex;align-items:center;gap:12px}
 .next-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text3);white-space:nowrap}
@@ -181,6 +211,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .modal-section-label{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:6px}
 .modal-instr{font-size:14px;color:var(--text2);line-height:1.7}
 .modal-cue{font-size:13px;color:var(--green);background:var(--green-dim);border-radius:var(--rs);padding:10px 12px;font-style:italic;line-height:1.6}
+.modal-link{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--blue);text-decoration:none;border-bottom:1px dashed rgba(96,165,250,.4);padding-bottom:1px}
+.modal-link:hover{color:#93c5fd;border-bottom-color:#93c5fd}
 .modal-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem}
 .modal-stat{background:var(--surface2);border-radius:var(--rs);padding:.75rem;text-align:center}
 .modal-stat-val{font-family:'DM Mono',monospace;font-size:16px;color:var(--text);display:block}
@@ -191,9 +223,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 /* ── MOBILE ── */
 @media (max-width:480px){
   body{padding:1.25rem .75rem 4rem}
+  body.large-text{font-size:17px}
   .setup-title{font-size:30px}
   .app-topbar{margin-bottom:.75rem}
-  .sound-btn{padding:8px 10px;font-size:10px}
+  .topbar-group{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+  .topbar-label{grid-column:1 / -1;min-width:0;margin-bottom:2px}
+  .sound-btn,.wake-btn,.a11y-btn{padding:8px 10px;font-size:10px}
+  .sound-btn,.wake-btn,.a11y-btn{justify-content:center}
   .time-selector{gap:6px}
   .time-btn{padding:.75rem .5rem}
   .time-btn .mins{font-size:22px}
@@ -204,11 +240,25 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   .illus-wrap{width:88px;height:88px}
   .illus-wrap svg{width:72px;height:72px}
   .ex-name{font-size:19px}
-  .ctrl-btn{padding:12px 6px;font-size:12px}
+  .ctrl-btn{padding:12px 6px;font-size:12px;min-height:44px}
+  .time-btn{min-height:44px}
+  .info-btn{min-width:34px;min-height:34px}
   .ring-number{font-size:18px}
   .card-body{gap:.75rem}
   .modal-sheet{padding:1.25rem 1rem 2rem}
 }
+body.large-text .setup-title{font-size:40px}
+body.large-text .setup-sub{font-size:16px}
+body.large-text .plan-name{font-size:15px}
+body.large-text .ex-name{font-size:25px}
+body.large-text .ex-instruction{font-size:14px}
+body.large-text .ex-cue{font-size:13px}
+body.large-text .rep-info{font-size:12px}
+body.large-text .set-label{font-size:13px}
+body.large-text .ctrl-btn{font-size:15px}
+body.large-text .section-label{font-size:11px}
+body.large-text .modal-ex-name{font-size:26px}
+body.large-text .modal-instr{font-size:16px}
 @media (max-width:360px){
   .plan-tag{display:none}
   .tag-seated{display:none}
@@ -220,18 +270,46 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 <div class="app">
 
 <div class="app-topbar">
-  <button class="sound-btn" id="sound-btn" onclick="toggleSound()" aria-pressed="true" title="Toggle timer sounds">
-    <svg id="sound-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg>
-    <span id="sound-label">Sound on</span>
-  </button>
+  <div class="topbar-group">
+    <div class="topbar-label">Session</div>
+    <button class="sound-btn" id="sound-btn" onclick="toggleSound()" aria-pressed="true" title="Toggle timer sounds">
+      <svg id="sound-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M18.5 5.5a9 9 0 0 1 0 13"></path></svg>
+      <span id="sound-label">Sound on</span>
+    </button>
+    <button class="wake-btn" id="wake-btn" onclick="toggleWakeLock()" aria-pressed="false" title="Keep screen awake during session">
+      <svg id="wake-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2"></rect><line x1="11" y1="18" x2="13" y2="18"></line></svg>
+      <span id="wake-label">Screen lock off</span>
+    </button>
+  </div>
+  <div class="topbar-group">
+    <div class="topbar-label">Accessibility</div>
+    <button class="a11y-btn" id="voice-btn" onclick="toggleVoice()" aria-pressed="false" title="Voice countdown and rep cues">
+      <span id="voice-label">Voice off</span>
+    </button>
+    <button class="a11y-btn" id="text-btn" onclick="toggleLargeText()" aria-pressed="false" title="Larger text mode">
+      <span id="text-label">Text normal</span>
+    </button>
+    <button class="a11y-btn" id="contrast-btn" onclick="toggleHighContrast()" aria-pressed="false" title="High contrast mode">
+      <span id="contrast-label">Contrast normal</span>
+    </button>
+  </div>
 </div>
 
 <!-- SETUP -->
 <div id="s-setup" class="screen active">
   <div class="logo">cervical spine rehab · C5/C6/C7</div>
+  <div class="program-tabs">
+    <button class="program-tab active" id="tab-cspine" onclick="switchProgram('cspine')">Cervical</button>
+    <button class="program-tab" id="tab-lowerback" onclick="switchProgram('lowerback')">Lower Back</button>
+  </div>
   <h1 class="setup-title">Your session<br>starts here.</h1>
-  <p class="setup-sub">Guided routine for C5/C6/C7 disc herniation. Drag to reorder exercises. Clinically-appropriate timing for each movement.</p>
+  <p class="setup-sub" id="setup-sub">Guided routine for C5/C6/C7 disc herniation. Drag to reorder exercises. Clinically-appropriate timing for each movement.</p>
   <div class="selected-summary" id="selected-summary">selected: 00:00 · 0 exercises</div>
+  <div class="analytics-box">
+    <div class="analytics-row"><span>sessions</span><span id="analytics-sessions">0</span></div>
+    <div class="analytics-row"><span>total minutes</span><span id="analytics-minutes">0</span></div>
+    <div class="analytics-row"><span>streak</span><span id="analytics-streak">0 days</span></div>
+  </div>
 
   <div class="section-label">Session length</div>
   <div class="time-selector">
@@ -276,11 +354,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         </div>
       </div>
       <div class="ex-cue" id="ex-cue-disp" style="display:none"></div>
+      <div class="quality-card" id="quality-card" style="display:none">
+        <div class="quality-title">Form checklist</div>
+        <ul class="quality-list" id="quality-list"></ul>
+        <div class="quality-mistake" id="quality-mistake"></div>
+      </div>
 
       <div class="timer-row">
         <div class="ring-container">
           <svg viewBox="0 0 80 80"><circle class="ring-bg" cx="40" cy="40" r="33"/><circle class="ring-fill" id="ring-fill" cx="40" cy="40" r="33"/></svg>
-          <div class="ring-text"><span class="ring-number" id="ring-num">5</span><span class="ring-unit" id="ring-unit">sec</span></div>
+          <div class="ring-text"><span class="ring-number" id="ring-num">7</span><span class="ring-unit" id="ring-unit">sec</span></div>
         </div>
         <div class="timer-details">
           <div class="rep-info" id="rep-info">—</div>
@@ -290,6 +373,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
             <span class="rep-num" id="rep-current">1</span>
             <span class="rep-total" id="rep-total">/ 10 reps</span>
           </div>
+          <div class="side-counter" id="side-counter">L 0 | R 0</div>
         </div>
       </div>
     </div>
@@ -358,10 +442,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div class="modal-section-label">Coaching cue</div>
       <div class="modal-cue" id="modal-cue">—</div>
     </div>
+    <div class="modal-section">
+      <div class="modal-section-label">Learn more</div>
+      <a id="modal-link" class="modal-link" href="#" target="_blank" rel="noopener noreferrer">Open exercise details</a>
+    </div>
     <button class="modal-close" onclick="closeModal()">Close</button>
   </div>
 </div>
 
+<script src="js/config.js"></script>
 <script>
 // ════════════════════════════════════════════════════════════════
 // ANIMATED SVG ILLUSTRATIONS
@@ -688,13 +777,125 @@ const ILLUS = {
   <line x1="45" y1="50" x2="52" y2="68" stroke="#8a8882" stroke-width="1.5"/>
   <line x1="28" y1="50" x2="62" y2="50" stroke="#8a8882" stroke-width="1.5"/>
   <text x="45" y="80" text-anchor="middle" font-size="7.5" fill="#55534f" font-family="DM Mono,monospace">pec stretch</text>
+</svg>`,
+
+'seated-extension': `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .se-head{animation:se-look 3.4s ease-in-out infinite;transform-origin:45px 34px}
+    @keyframes se-look{0%,100%{transform:rotate(0)}50%{transform:rotate(-22deg)}}
+  </style>
+  <rect x="30" y="60" width="30" height="6" rx="2" fill="none" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="35" y1="66" x2="33" y2="75" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="55" y1="66" x2="57" y2="75" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="45" y1="36" x2="45" y2="60" stroke="#8a8882" stroke-width="1.8"/>
+  <path d="M32 50 Q45 44 58 50" fill="none" stroke="#8a8882" stroke-width="1.8"/>
+  <line x1="32" y1="50" x2="32" y2="60" stroke="#8a8882" stroke-width="1.5"/>
+  <line x1="58" y1="50" x2="58" y2="60" stroke="#8a8882" stroke-width="1.5"/>
+  <g class="se-head">
+    <ellipse cx="45" cy="22" rx="11" ry="13" fill="none" stroke="#60a5fa" stroke-width="1.8"/>
+    <circle cx="41" cy="19" r="1.2" fill="#60a5fa"/>
+    <circle cx="49" cy="19" r="1.2" fill="#60a5fa"/>
+  </g>
+  <path d="M56 20 Q63 16 68 21" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="3 2"/>
+  <text x="45" y="83" text-anchor="middle" font-size="7.5" fill="#55534f" font-family="DM Mono,monospace">neck extension</text>
+</svg>`,
+
+'band-seated-row': `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .br-arms{animation:br-pull 2.6s ease-in-out infinite;transform-origin:45px 44px}
+    .br-band{animation:br-band 2.6s ease-in-out infinite}
+    @keyframes br-pull{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.82)}}
+    @keyframes br-band{0%,100%{stroke-dasharray:2 0}50%{stroke-dasharray:2 2}}
+  </style>
+  <rect x="30" y="60" width="30" height="6" rx="2" fill="none" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="35" y1="66" x2="33" y2="75" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="55" y1="66" x2="57" y2="75" stroke="#55534f" stroke-width="1.5"/>
+  <ellipse cx="45" cy="22" rx="10" ry="12" fill="none" stroke="#60a5fa" stroke-width="1.8"/>
+  <line x1="45" y1="34" x2="45" y2="60" stroke="#8a8882" stroke-width="1.8"/>
+  <g class="br-arms">
+    <path d="M30 44 Q45 38 60 44" fill="none" stroke="#8a8882" stroke-width="1.8"/>
+    <line x1="30" y1="44" x2="20" y2="46" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="60" y1="44" x2="70" y2="46" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
+  <line class="br-band" x1="20" y1="46" x2="70" y2="46" stroke="#a78bfa" stroke-width="1.4" stroke-linecap="round"/>
+  <text x="45" y="83" text-anchor="middle" font-size="7.5" fill="#55534f" font-family="DM Mono,monospace">seated band row</text>
+</svg>`,
+
+'shoulder-protraction-stretch': `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .sp-body{animation:sp-reach 3s ease-in-out infinite;transform-origin:45px 44px}
+    @keyframes sp-reach{0%,100%{transform:scaleX(1)}50%{transform:scaleX(1.14)}}
+  </style>
+  <rect x="30" y="60" width="30" height="6" rx="2" fill="none" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="35" y1="66" x2="33" y2="75" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="55" y1="66" x2="57" y2="75" stroke="#55534f" stroke-width="1.5"/>
+  <g class="sp-body">
+    <ellipse cx="45" cy="22" rx="10" ry="12" fill="none" stroke="#60a5fa" stroke-width="1.8"/>
+    <line x1="45" y1="34" x2="45" y2="60" stroke="#8a8882" stroke-width="1.8"/>
+    <path d="M31 44 Q45 40 59 44" fill="none" stroke="#8a8882" stroke-width="1.8"/>
+    <line x1="31" y1="44" x2="20" y2="44" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/>
+    <line x1="59" y1="44" x2="70" y2="44" stroke="#4ade80" stroke-width="1.8" stroke-linecap="round"/>
+    <path d="M20 44 Q45 54 70 44" fill="none" stroke="#a78bfa" stroke-width="1.3" stroke-dasharray="3 2"/>
+  </g>
+  <text x="45" y="83" text-anchor="middle" font-size="7.5" fill="#55534f" font-family="DM Mono,monospace">forward reach stretch</text>
+</svg>`,
+
+'behind-back-sidebend': `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .bb-head{animation:bb-tilt 3.2s ease-in-out infinite;transform-origin:45px 34px}
+    .bb-arm{animation:bb-pull 3.2s ease-in-out infinite}
+    @keyframes bb-tilt{0%,100%{transform:rotate(0)}50%{transform:rotate(18deg)}}
+    @keyframes bb-pull{0%,100%{transform:translateX(0)}50%{transform:translateX(-2px)}}
+  </style>
+  <rect x="30" y="60" width="30" height="6" rx="2" fill="none" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="35" y1="66" x2="33" y2="75" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="55" y1="66" x2="57" y2="75" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="45" y1="36" x2="45" y2="60" stroke="#8a8882" stroke-width="1.8"/>
+  <path d="M32 48 Q45 42 58 48" fill="none" stroke="#8a8882" stroke-width="1.8"/>
+  <g class="bb-head">
+    <ellipse cx="45" cy="22" rx="11" ry="13" fill="none" stroke="#60a5fa" stroke-width="1.8"/>
+    <circle cx="41" cy="19" r="1.2" fill="#60a5fa"/>
+    <circle cx="49" cy="19" r="1.2" fill="#60a5fa"/>
+  </g>
+  <g class="bb-arm">
+    <line x1="32" y1="48" x2="35" y2="60" stroke="#4ade80" stroke-width="1.6"/>
+    <line x1="35" y1="60" x2="42" y2="56" stroke="#4ade80" stroke-width="1.6"/>
+  </g>
+  <path d="M56 18 Q64 18 67 26" fill="none" stroke="#a78bfa" stroke-width="1.4" stroke-dasharray="3 2"/>
+  <text x="45" y="83" text-anchor="middle" font-size="7.2" fill="#55534f" font-family="DM Mono,monospace">behind-back + side bend</text>
+</svg>`,
+
+'shoulder-shrugs': `<svg viewBox="0 0 90 90" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    .ss2-shoulders{animation:ss2-lift 2.4s ease-in-out infinite;transform-origin:45px 44px}
+    @keyframes ss2-lift{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+  </style>
+  <rect x="30" y="60" width="30" height="6" rx="2" fill="none" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="35" y1="66" x2="33" y2="75" stroke="#55534f" stroke-width="1.5"/>
+  <line x1="55" y1="66" x2="57" y2="75" stroke="#55534f" stroke-width="1.5"/>
+  <ellipse cx="45" cy="22" rx="10" ry="12" fill="none" stroke="#60a5fa" stroke-width="1.8"/>
+  <line x1="45" y1="34" x2="45" y2="60" stroke="#8a8882" stroke-width="1.8"/>
+  <g class="ss2-shoulders">
+    <path d="M30 46 Q45 38 60 46" fill="none" stroke="#8a8882" stroke-width="1.8"/>
+    <path d="M28 40 Q28 35 32 33" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="3 2"/>
+    <path d="M62 33 Q66 35 66 40" fill="none" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="3 2"/>
+  </g>
+  <text x="45" y="83" text-anchor="middle" font-size="7.5" fill="#55534f" font-family="DM Mono,monospace">shoulder shrugs</text>
 </svg>`
 };
+
+function getFallbackExerciseSvg(ex) {
+  return `<svg viewBox="0 0 90 90"><text x="45" y="50" text-anchor="middle" font-size="9" fill="#55534f" font-family="DM Mono,monospace">${ex.name}</text></svg>`;
+}
+
+function renderExerciseVisual(container, ex) {
+  container.innerHTML = ILLUS[ex.id] ? ILLUS[ex.id] : getFallbackExerciseSvg(ex);
+}
 
 // ════════════════════════════════════════════════════════════════
 // EXERCISE DATABASE
 // ════════════════════════════════════════════════════════════════
-const ALL_EXERCISES = [
+const CSPINE_EXERCISES = [
   {id:'chin-tuck',name:'Chin tuck',category:'Stabilization',seated:false,
    instruction:'Draw your chin straight back — not down. Purely horizontal movement. Feel a gentle stretch at the base of the skull.',
    cue:'Imagine a string pulling the back of your head toward the wall behind you.',
@@ -708,17 +909,22 @@ const ALL_EXERCISES = [
   {id:'shoulder-squeeze',name:'Shoulder blade squeeze',category:'Mobility',seated:true,
    instruction:'Pull shoulder blades together and slightly downward. Hold, then release fully. Keep shoulders away from your ears.',
    cue:'Imagine holding a pencil between your shoulder blades.',
-   type:'hold',holdSec:5,repsPerSet:10,sets:3,restBetweenSets:20,restBetweenEx:25},
+  type:'hold',holdSec:7,repsPerSet:10,sets:3,restBetweenSets:20,restBetweenEx:25},
 
   {id:'seated-rotation',name:'Seated neck rotation',category:'Mobility',seated:true,
    instruction:'Sit tall. Slowly rotate head to look over one shoulder. Hold at comfortable end range. Return to centre and repeat other side.',
    cue:'Never force the range. Work only within a pain-free zone.',
-   type:'hold',holdSec:5,repsPerSet:6,sets:3,restBetweenSets:15,restBetweenEx:20},
+  type:'hold',holdSec:7,repsPerSet:6,sets:3,restBetweenSets:15,restBetweenEx:20},
 
   {id:'seated-flexion',name:'Seated neck flexion',category:'Mobility',seated:true,
    instruction:'Sit upright. Slowly lower chin toward chest, feeling a stretch down the back of the neck. Hold 5 seconds, return slowly.',
    cue:'Keep the movement smooth and gravity-assisted. No forcing.',
-   type:'hold',holdSec:5,repsPerSet:6,sets:2,restBetweenSets:15,restBetweenEx:20},
+  type:'hold',holdSec:7,repsPerSet:6,sets:2,restBetweenSets:15,restBetweenEx:20},
+
+  {id:'seated-extension',name:'Seated neck extension',category:'Mobility',seated:true,
+   instruction:'Sit or stand tall. Slowly lift your chin toward the ceiling, then return to neutral with control.',
+   cue:'Move only in a comfortable range and keep your lower back neutral.',
+  type:'hold',holdSec:7,repsPerSet:6,sets:2,restBetweenSets:15,restBetweenEx:20},
 
   {id:'seated-side-bend',name:'Seated side bend',category:'Stretch',seated:true,
    instruction:'Sit upright. Tilt one ear toward the same-side shoulder. Hold. You should feel a stretch on the opposite side of the neck.',
@@ -730,10 +936,30 @@ const ALL_EXERCISES = [
    cue:'Think: shoulders back AND down together. Not just back.',
    type:'hold',holdSec:6,repsPerSet:8,sets:3,restBetweenSets:20,restBetweenEx:25},
 
+  {id:'band-seated-row',name:'Seated band row',category:'Posture',seated:true,
+   instruction:'Sit tall with a resistance band in both hands. Pull elbows back close to your body while squeezing shoulder blades, then return slowly.',
+   cue:'Aim for smooth controlled reps; avoid shrugging your shoulders upward.',
+   type:'dynamic',setDuration:45,sets:3,restBetweenSets:30,restBetweenEx:30},
+
+  {id:'shoulder-protraction-stretch',name:'Shoulder protraction stretch',category:'Stretch',seated:true,
+   instruction:'Interlock fingers, reach both arms forward at shoulder height, and gently round your upper back to open the space between shoulder blades.',
+   cue:'Keep elbows straight and breathe out as you reach forward.',
+   type:'hold',holdSec:25,repsPerSet:2,sets:2,restBetweenSets:15,restBetweenEx:20},
+
+  {id:'behind-back-sidebend',name:'Behind-back shoulder + side bend stretch',category:'Stretch',seated:true,
+   instruction:'Place one arm behind your back, gently assist with the other hand, then side-bend your neck toward the same side. Repeat both sides.',
+   cue:'Use gentle tension only; this should feel like a stretch, not pain.',
+   type:'hold',holdSec:20,repsPerSet:2,sets:2,restBetweenSets:15,restBetweenEx:25},
+
+  {id:'shoulder-shrugs',name:'Shoulder shrugs',category:'Mobility',seated:true,
+   instruction:'Lift shoulders toward ears, pause briefly, then lower them down under control.',
+   cue:'Keep neck long and avoid rolling the shoulders forward.',
+   type:'hold',holdSec:2,repsPerSet:12,sets:3,restBetweenSets:20,restBetweenEx:20},
+
   {id:'bird-dog',name:'Bird-dog',category:'Stabilization',seated:false,
    instruction:'On hands and knees. Extend right arm and left leg simultaneously. Keep hips level, neck neutral — eyes to floor. Switch sides.',
    cue:'Move like water — slow, controlled. Each paired side counts as one rep.',
-   type:'hold',holdSec:5,repsPerSet:6,sets:3,restBetweenSets:30,restBetweenEx:30},
+  type:'hold',holdSec:7,repsPerSet:6,sets:3,restBetweenSets:30,restBetweenEx:30},
 
   {id:'dead-bug',name:'Dead bug',category:'Stabilization',seated:false,
    instruction:'Lie on back, arms pointing up, knees bent 90°. Press lower back to floor. Slowly lower right arm and extend left leg. Return, switch.',
@@ -771,33 +997,274 @@ const ALL_EXERCISES = [
    type:'dynamic',setDuration:20,sets:3,restBetweenSets:30,restBetweenEx:30},
 ];
 
+const LOWER_BACK_EXERCISES = [
+  {id:'lb-child-pose',name:'Child’s pose',category:'Stretch',seated:false,
+   instruction:'From all fours, sit hips back toward heels and reach your arms forward on the floor.',
+   cue:'Breathe into your lower ribs and back; do not force depth.',
+   type:'hold',holdSec:45,repsPerSet:1,sets:3,restBetweenSets:15,restBetweenEx:20},
+
+  {id:'lb-single-knee-chest',name:'Single knee-to-chest',category:'Stretch',seated:false,
+   instruction:'Lie on your back and gently pull one knee toward your chest. Alternate sides.',
+   cue:'Keep the other leg relaxed and avoid yanking the knee.',
+   type:'hold',holdSec:20,repsPerSet:6,sets:1,restBetweenSets:10,restBetweenEx:15},
+
+  {id:'lb-double-knee-chest',name:'Double knee-to-chest',category:'Stretch',seated:false,
+   instruction:'Lie on your back and pull both knees in toward your chest together.',
+   cue:'Keep shoulders relaxed and breathe steadily.',
+   type:'hold',holdSec:25,repsPerSet:4,sets:1,restBetweenSets:10,restBetweenEx:15},
+
+  {id:'lb-cat-cow',name:'Cat-cow',category:'Mobility',seated:false,
+   instruction:'On all fours, alternate rounding your spine up and extending your spine down in a smooth rhythm.',
+   cue:'Move from pelvis to chest slowly rather than forcing end range.',
+   type:'dynamic',setDuration:60,sets:2,restBetweenSets:30,restBetweenEx:20},
+
+  {id:'lb-rotational-stretch',name:'Lower back rotational stretch',category:'Mobility',seated:false,
+   instruction:'Lie on your back with knees bent and gently rock both knees side to side.',
+   cue:'Shoulders stay grounded; move only as far as comfortable.',
+   type:'hold',holdSec:8,repsPerSet:16,sets:1,restBetweenSets:0,restBetweenEx:15},
+
+  {id:'lb-figure-four',name:'Piriformis figure-four stretch',category:'Stretch',seated:false,
+   instruction:'Cross one ankle over opposite knee and pull the bottom leg toward you. Alternate sides.',
+   cue:'You should feel stretch in glute/hip, not knee pain.',
+   type:'hold',holdSec:45,repsPerSet:4,sets:1,restBetweenSets:15,restBetweenEx:20},
+
+  {id:'lb-hamstring-strap',name:'Hamstring strap stretch',category:'Stretch',seated:false,
+   instruction:'Loop a towel/strap around one foot and gently straighten that leg upward. Alternate sides.',
+   cue:'Keep pelvis neutral and avoid forcing knee lockout.',
+   type:'hold',holdSec:20,repsPerSet:4,sets:1,restBetweenSets:10,restBetweenEx:15},
+
+  {id:'lb-sphinx',name:'Sphinx stretch',category:'Stretch',seated:false,
+   instruction:'Lie face down and prop onto forearms, lifting chest while pelvis stays down.',
+   cue:'Stop if extension causes sharp or radiating pain.',
+   type:'hold',holdSec:45,repsPerSet:4,sets:1,restBetweenSets:20,restBetweenEx:20},
+
+  {id:'lb-seated-twist',name:'Seated spinal twist',category:'Mobility',seated:true,
+   instruction:'Sit tall, cross one foot over and gently rotate torso toward the bent knee. Alternate sides.',
+   cue:'Lengthen spine before twisting; keep movement gentle.',
+   type:'hold',holdSec:45,repsPerSet:4,sets:1,restBetweenSets:10,restBetweenEx:20},
+
+  {id:'lb-pelvic-tilt',name:'Pelvic tilts',category:'Stabilization',seated:false,
+   instruction:'On your back with knees bent, tighten core and flatten low back gently into the floor.',
+   cue:'Small controlled motion beats big range.',
+   type:'hold',holdSec:8,repsPerSet:15,sets:2,restBetweenSets:20,restBetweenEx:20},
+
+  {id:'lb-glute-bridge',name:'Glute bridges',category:'Stabilization',seated:false,
+   instruction:'Lift hips until knees-hips-shoulders align, then lower slowly.',
+   cue:'Drive through heels and squeeze glutes at the top.',
+   type:'hold',holdSec:10,repsPerSet:12,sets:3,restBetweenSets:60,restBetweenEx:25},
+
+  {id:'lb-bird-dog',name:'Bird-dog (lumbar stability)',category:'Stabilization',seated:false,
+   instruction:'From all fours, extend opposite arm and leg while keeping trunk stable.',
+   cue:'Keep hips level and neck neutral.',
+   type:'hold',holdSec:8,repsPerSet:10,sets:2,restBetweenSets:30,restBetweenEx:25},
+
+  {id:'lb-dead-bug',name:'Dead bug (core control)',category:'Stabilization',seated:false,
+   instruction:'Lower opposite arm and leg while keeping lower back controlled against floor.',
+   cue:'Reduce range if your low back arches.',
+   type:'dynamic',setDuration:50,sets:2,restBetweenSets:45,restBetweenEx:25},
+
+  {id:'lb-side-plank-mod',name:'Side plank (modified)',category:'Stabilization',seated:false,
+   instruction:'On one forearm and knees, lift hips into a straight line and hold. Alternate sides.',
+   cue:'Keep shoulders stacked and avoid sagging hips.',
+   type:'hold',holdSec:20,repsPerSet:4,sets:2,restBetweenSets:30,restBetweenEx:25},
+
+  {id:'lb-superman',name:'Superman',category:'Stabilization',seated:false,
+   instruction:'Lie prone and gently lift arms/legs a little from floor, then lower with control.',
+   cue:'Lift small and controlled; no neck crunching.',
+   type:'hold',holdSec:3,repsPerSet:10,sets:2,restBetweenSets:20,restBetweenEx:20},
+];
+
 const CATEGORY_TAGS = {
   Stabilization:'tag-stab',Stretch:'tag-stretch',
   Mobility:'tag-mobility',Posture:'tag-posture'
 };
 
-const PREP_TIME = 5;
+const PREP_TIME = 7;
+const PROGRAMS = {
+  cspine: {
+    name: 'Cervical spine',
+    subtitle: 'Guided routine for C5/C6/C7 disc herniation. Drag to reorder exercises. Clinically-appropriate timing for each movement.',
+    exercises: CSPINE_EXERCISES
+  },
+  lowerback: {
+    name: 'Lower back',
+    subtitle: 'Lower back relief routine focused on flexibility + stability. Never push into sharp pain; stop if symptoms worsen.',
+    exercises: LOWER_BACK_EXERCISES
+  }
+};
+
+let activeProgram = 'cspine';
+
+function getCurrentExercises() {
+  return PROGRAMS[activeProgram].exercises;
+}
 
 function calcExTime(ex) {
   const st = ex.type === 'hold' ? ex.holdSec * ex.repsPerSet : ex.setDuration;
-  return st * ex.sets + ex.restBetweenSets * (ex.sets - 1) + ex.restBetweenEx + PREP_TIME;
+  return st * ex.sets + getRestBetweenSets(ex) * (ex.sets - 1) + getRestBetweenExercise(ex) + PREP_TIME;
 }
 
 // ════════════════════════════════════════════════════════════════
 // STATE
 // ════════════════════════════════════════════════════════════════
 let chosenMins = 5;
-let masterOrder = ALL_EXERCISES.map(e => e.id); // drag order
+let masterOrder = getCurrentExercises().map(e => e.id); // drag order
 let sessionPlan = [];
 let selectedIds = new Set();
 let audioCtx = null;
 let soundEnabled = true;
+let voiceEnabled = false;
+let keepAwake = false;
+let largeTextEnabled = false;
+let highContrastEnabled = false;
+let wakeLockSentinel = null;
+const ANALYTICS_KEY = 'cspine-analytics-v1';
+const PREFS_KEY = 'cspine-ui-prefs-v1';
+let analytics = { totalSessions:0, totalMinutes:0, streak:0, lastDate:'' };
 let state = {
   exIdx:0,setIdx:0,repIdx:0,phase:'prep',
   phaseTime:PREP_TIME,phaseMax:PREP_TIME,
   totalLeft:0,totalMax:0,ticker:null,paused:false,
-  setsCompleted:0,exCompleted:0,completedNames:[]
+  setsCompleted:0,exCompleted:0,completedNames:[],
+  sideLeft:0,sideRight:0
 };
+
+function haptic(ms=14) {
+  if (navigator.vibrate) navigator.vibrate(ms);
+}
+
+function savePreferences() {
+  const prefs = {
+    voiceEnabled,
+    largeTextEnabled,
+    highContrastEnabled,
+    keepAwake,
+    soundEnabled
+  };
+  localStorage.setItem(PREFS_KEY, JSON.stringify(prefs));
+}
+
+function loadPreferences() {
+  try {
+    const raw = localStorage.getItem(PREFS_KEY);
+    if (!raw) return;
+    const prefs = JSON.parse(raw);
+    soundEnabled = !!prefs.soundEnabled;
+    voiceEnabled = !!prefs.voiceEnabled;
+    keepAwake = !!prefs.keepAwake;
+    largeTextEnabled = !!prefs.largeTextEnabled;
+    highContrastEnabled = !!prefs.highContrastEnabled;
+  } catch (e) {}
+}
+
+function applyA11yClasses() {
+  document.body.classList.toggle('large-text', largeTextEnabled);
+  document.body.classList.toggle('high-contrast', highContrastEnabled);
+}
+
+function updateWakeButton() {
+  const btn = document.getElementById('wake-btn');
+  const label = document.getElementById('wake-label');
+  if (!btn || !label) return;
+  btn.classList.toggle('active', keepAwake);
+  btn.setAttribute('aria-pressed', String(keepAwake));
+  label.textContent = keepAwake ? 'Screen lock on' : 'Screen lock off';
+}
+
+async function requestWakeLock() {
+  if (!keepAwake || !('wakeLock' in navigator)) return;
+  try {
+    wakeLockSentinel = await navigator.wakeLock.request('screen');
+    wakeLockSentinel.addEventListener('release', () => {
+      wakeLockSentinel = null;
+    });
+  } catch (e) {
+    keepAwake = false;
+    updateWakeButton();
+  }
+}
+
+async function releaseWakeLock() {
+  if (wakeLockSentinel) {
+    try { await wakeLockSentinel.release(); } catch (e) {}
+    wakeLockSentinel = null;
+  }
+}
+
+async function toggleWakeLock() {
+  keepAwake = !keepAwake;
+  updateWakeButton();
+  savePreferences();
+  if (keepAwake) await requestWakeLock();
+  else await releaseWakeLock();
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && keepAwake) requestWakeLock();
+});
+
+function loadAnalytics() {
+  try {
+    const raw = localStorage.getItem(ANALYTICS_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    analytics = {
+      totalSessions: Number(data.totalSessions || 0),
+      totalMinutes: Number(data.totalMinutes || 0),
+      streak: Number(data.streak || 0),
+      lastDate: String(data.lastDate || '')
+    };
+  } catch (e) {}
+}
+
+function saveAnalytics() {
+  localStorage.setItem(ANALYTICS_KEY, JSON.stringify(analytics));
+}
+
+function todayStamp() {
+  return new Date().toISOString().slice(0,10);
+}
+
+function updateAnalyticsForSession(elapsedSec) {
+  const today = todayStamp();
+  analytics.totalSessions += 1;
+  analytics.totalMinutes += Math.max(1, Math.round(elapsedSec / 60));
+
+  if (!analytics.lastDate) analytics.streak = 1;
+  else if (analytics.lastDate !== today) {
+    const prev = new Date(analytics.lastDate + 'T00:00:00');
+    const now = new Date(today + 'T00:00:00');
+    const diffDays = Math.round((now - prev) / 86400000);
+    analytics.streak = diffDays === 1 ? analytics.streak + 1 : 1;
+  }
+  analytics.lastDate = today;
+  saveAnalytics();
+  updateAnalyticsUI();
+}
+
+function updateAnalyticsUI() {
+  const s = document.getElementById('analytics-sessions');
+  const m = document.getElementById('analytics-minutes');
+  const st = document.getElementById('analytics-streak');
+  if (!s || !m || !st) return;
+  s.textContent = String(analytics.totalSessions);
+  m.textContent = String(analytics.totalMinutes);
+  st.textContent = String(analytics.streak) + ' days';
+}
+
+function getRestBetweenSets(ex) {
+  const cfg = (window.APP_CONFIG && APP_CONFIG.categoryRestRules && APP_CONFIG.categoryRestRules[ex.category]) || null;
+  return cfg ? Math.max(ex.restBetweenSets, cfg.setRestMin) : ex.restBetweenSets;
+}
+
+function getRestBetweenExercise(ex) {
+  const cfg = (window.APP_CONFIG && APP_CONFIG.categoryRestRules && APP_CONFIG.categoryRestRules[ex.category]) || null;
+  return cfg ? Math.max(ex.restBetweenEx, cfg.betweenRestMin) : ex.restBetweenEx;
+}
+
+function isUnilateralExercise(ex) {
+  return !!(window.APP_CONFIG && APP_CONFIG.unilateralIds && APP_CONFIG.unilateralIds.has(ex.id));
+}
 
 function updateSoundButton() {
   const btn = document.getElementById('sound-btn');
@@ -816,7 +1283,66 @@ function updateSoundButton() {
 function toggleSound() {
   soundEnabled = !soundEnabled;
   updateSoundButton();
+  savePreferences();
   if (soundEnabled) ensureAudioContext();
+}
+
+function updateVoiceButton() {
+  const btn = document.getElementById('voice-btn');
+  const label = document.getElementById('voice-label');
+  if (!btn || !label) return;
+  btn.classList.toggle('active', voiceEnabled);
+  btn.setAttribute('aria-pressed', String(voiceEnabled));
+  label.textContent = voiceEnabled ? 'Voice on' : 'Voice off';
+}
+
+function updateTextButton() {
+  const btn = document.getElementById('text-btn');
+  const label = document.getElementById('text-label');
+  if (!btn || !label) return;
+  btn.classList.toggle('active', largeTextEnabled);
+  btn.setAttribute('aria-pressed', String(largeTextEnabled));
+  label.textContent = largeTextEnabled ? 'Text large' : 'Text normal';
+}
+
+function updateContrastButton() {
+  const btn = document.getElementById('contrast-btn');
+  const label = document.getElementById('contrast-label');
+  if (!btn || !label) return;
+  btn.classList.toggle('active', highContrastEnabled);
+  btn.setAttribute('aria-pressed', String(highContrastEnabled));
+  label.textContent = highContrastEnabled ? 'Contrast high' : 'Contrast normal';
+}
+
+function toggleVoice() {
+  voiceEnabled = !voiceEnabled;
+  updateVoiceButton();
+  savePreferences();
+  if (!voiceEnabled && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+}
+
+function toggleLargeText() {
+  largeTextEnabled = !largeTextEnabled;
+  applyA11yClasses();
+  updateTextButton();
+  savePreferences();
+}
+
+function toggleHighContrast() {
+  highContrastEnabled = !highContrastEnabled;
+  applyA11yClasses();
+  updateContrastButton();
+  savePreferences();
+}
+
+function speakCue(text, priority = false) {
+  if (!voiceEnabled || !('speechSynthesis' in window)) return;
+  if (priority) window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = 1;
+  utterance.pitch = 1;
+  utterance.volume = 0.85;
+  window.speechSynthesis.speak(utterance);
 }
 
 function ensureAudioContext() {
@@ -886,6 +1412,47 @@ function playPhaseStartSound(type) {
   playTimerStartSound();
 }
 
+function getExerciseReferenceUrl(ex) {
+  const links = window.APP_CONFIG && APP_CONFIG.exerciseLinks ? APP_CONFIG.exerciseLinks : {};
+  return links[ex.id] || ('https://www.youtube.com/results?search_query=' + encodeURIComponent(ex.name + ' exercise'));
+}
+
+function getExerciseChecklist(ex) {
+  const categoryMap = {
+    Stabilization: [
+      'Brace your core before each movement.',
+      'Keep your spine neutral; avoid twisting compensation.',
+      'Move slowly and keep breathing throughout.'
+    ],
+    Mobility: [
+      'Use smooth, controlled range only.',
+      'Avoid bouncing or forcing end range.',
+      'Keep shoulders and jaw relaxed.'
+    ],
+    Stretch: [
+      'Ease into the stretch without forcing depth.',
+      'Keep breaths slow and even.',
+      'Back off immediately if pain radiates or spikes.'
+    ],
+    Posture: [
+      'Stack head over shoulders with long neck.',
+      'Keep chest open and shoulder blades lightly set.',
+      'Hold gentle tension instead of straining.'
+    ]
+  };
+  return categoryMap[ex.category] || ['Move in a pain-free range.', 'Breathe steadily.', 'Stop if symptoms worsen.'];
+}
+
+function getExerciseCommonMistake(ex) {
+  const categoryMap = {
+    Stabilization: 'Common mistake: rushing reps and losing neutral spine alignment.',
+    Mobility: 'Common mistake: using momentum instead of controlled mobility.',
+    Stretch: 'Common mistake: forcing stretch depth and holding your breath.',
+    Posture: 'Common mistake: shrugging shoulders while trying to stay upright.'
+  };
+  return categoryMap[ex.category] || 'Common mistake: ignoring symptom increase and pushing through pain.';
+}
+
 function formatSeconds(sec) {
   const m = Math.floor(sec / 60);
   const s = sec % 60;
@@ -893,9 +1460,10 @@ function formatSeconds(sec) {
 }
 
 function getSelectedPlanByOrder() {
+  const allExercises = getCurrentExercises();
   return masterOrder
     .filter(id => selectedIds.has(id))
-    .map(id => ALL_EXERCISES.find(e => e.id === id))
+    .map(id => allExercises.find(e => e.id === id))
     .filter(Boolean);
 }
 
@@ -913,14 +1481,48 @@ function shuffleArray(arr) {
 }
 
 function applyRandomPreset(mins) {
+  const allExercises = getCurrentExercises();
   const budget = mins * 60;
-  const randomPool = shuffleArray(ALL_EXERCISES.map(e => e.id));
   const picked = new Set();
   let used = 0;
+  const allByCategory = {};
+  const catOrder = shuffleArray((window.APP_CONFIG && APP_CONFIG.randomPresetCategoryOrder) || ['Stabilization','Mobility','Stretch','Posture']);
+
+  allExercises.forEach(ex => {
+    allByCategory[ex.category] = allByCategory[ex.category] || [];
+    allByCategory[ex.category].push(ex.id);
+  });
+
+  catOrder.forEach(cat => {
+    if (allByCategory[cat]) allByCategory[cat] = shuffleArray(allByCategory[cat]);
+  });
+
+  let progressed = true;
+  while (progressed) {
+    progressed = false;
+    for (let i = 0; i < catOrder.length; i++) {
+      const cat = catOrder[i];
+      const list = allByCategory[cat] || [];
+      while (list.length) {
+        const id = list.shift();
+        const ex = allExercises.find(e => e.id === id);
+        const t = calcExTime(ex);
+        if (!picked.has(id) && used + t <= budget - 5) {
+          picked.add(id);
+          used += t;
+          progressed = true;
+          break;
+        }
+      }
+    }
+  }
+
+  const randomPool = shuffleArray(allExercises.map(e => e.id));
 
   for (let i = 0; i < randomPool.length; i++) {
     const id = randomPool[i];
-    const ex = ALL_EXERCISES.find(e => e.id === id);
+    if (picked.has(id)) continue;
+    const ex = allExercises.find(e => e.id === id);
     const t = calcExTime(ex);
     if (used + t <= budget - 5) {
       picked.add(id);
@@ -929,7 +1531,7 @@ function applyRandomPreset(mins) {
   }
 
   if (picked.size === 0) {
-    const shortest = [...ALL_EXERCISES].sort((a, b) => calcExTime(a) - calcExTime(b))[0];
+    const shortest = [...allExercises].sort((a, b) => calcExTime(a) - calcExTime(b))[0];
     if (shortest) picked.add(shortest.id);
   }
 
@@ -953,6 +1555,29 @@ function onExerciseToggle(id, checked) {
 // ════════════════════════════════════════════════════════════════
 // SETUP
 // ════════════════════════════════════════════════════════════════
+function switchProgram(programKey) {
+  if (!PROGRAMS[programKey]) return;
+  activeProgram = programKey;
+
+  document.getElementById('tab-cspine').classList.toggle('active', programKey === 'cspine');
+  document.getElementById('tab-lowerback').classList.toggle('active', programKey === 'lowerback');
+
+  const setupSub = document.getElementById('setup-sub');
+  if (setupSub) setupSub.textContent = PROGRAMS[programKey].subtitle;
+
+  const logo = document.querySelector('.logo');
+  if (logo) {
+    logo.textContent = programKey === 'cspine'
+      ? 'cervical spine rehab · C5/C6/C7'
+      : 'lower back rehab · mobility + stability';
+  }
+
+  masterOrder = getCurrentExercises().map(e => e.id);
+  selectedIds = new Set();
+  applyRandomPreset(chosenMins);
+  renderSetup();
+}
+
 function selectTime(m) {
   chosenMins = m;
   document.getElementById('btn5').classList.toggle('active', m===5);
@@ -963,6 +1588,7 @@ function selectTime(m) {
 }
 
 function renderSetup() {
+  const allExercises = getCurrentExercises();
   updateSelectedSummary();
   document.getElementById('count5').textContent = 'randomize';
   document.getElementById('count10').textContent = 'randomize';
@@ -972,7 +1598,7 @@ function renderSetup() {
   el.innerHTML = '';
 
   masterOrder.forEach((id, i) => {
-    const ex = ALL_EXERCISES.find(e => e.id === id);
+    const ex = allExercises.find(e => e.id === id);
     if (!ex) return;
     const inPlan = selectedIds.has(id);
     const meta = ex.type === 'hold'
@@ -1128,11 +1754,14 @@ function startSession() {
   sessionPlan = getSelectedPlanByOrder();
   if (sessionPlan.length === 0) return;
   ensureAudioContext();
+  if (keepAwake) requestWakeLock();
+  haptic(20);
   const totalSec = getSelectedTotalSec();
   state = {exIdx:0,setIdx:0,repIdx:0,phase:'prep',
     phaseTime:PREP_TIME,phaseMax:PREP_TIME,
     totalLeft:totalSec,totalMax:totalSec,
-    ticker:null,paused:false,setsCompleted:0,exCompleted:0,completedNames:[]};
+    ticker:null,paused:false,setsCompleted:0,exCompleted:0,completedNames:[],
+    sideLeft:0,sideRight:0};
   showScreen('s-session');
   enterPhase('prep');
   renderQueue();
@@ -1146,14 +1775,23 @@ function enterPhase(type) {
     const d = ex.type==='hold' ? ex.holdSec : ex.setDuration;
     state.phaseMax=d; state.phaseTime=d;
   }
-  else if (type==='rest') { state.phaseMax=ex.restBetweenSets; state.phaseTime=ex.restBetweenSets; }
+  else if (type==='rest') { state.phaseMax=getRestBetweenSets(ex); state.phaseTime=getRestBetweenSets(ex); }
   else if (type==='between') {
-    const d = ex ? ex.restBetweenEx : 25;
+    const d = ex ? getRestBetweenExercise(ex) : 25;
     state.phaseMax=d; state.phaseTime=d;
+  }
+  if (type === 'prep' && state.setIdx === 0) {
+    state.sideLeft = 0;
+    state.sideRight = 0;
   }
   updateUI();
   clearInterval(state.ticker);
   playPhaseStartSound(type);
+  if (type === 'prep') speakCue('Get ready', true);
+  if (type === 'work' && ex) speakCue('Start ' + ex.name, true);
+  if (type === 'rest') speakCue('Rest', true);
+  if (type === 'between' && ex) speakCue('Up next: ' + ex.name, true);
+  haptic(type === 'work' ? 10 : 7);
   state.ticker = setInterval(tick, 1000);
 }
 
@@ -1161,6 +1799,9 @@ function tick() {
   if (state.paused) return;
   state.phaseTime--;
   state.totalLeft = Math.max(0, state.totalLeft - 1);
+  if ((state.phase === 'prep' || state.phase === 'work') && state.phaseTime > 0 && state.phaseTime <= 3) {
+    speakCue(String(state.phaseTime));
+  }
   updateUI();
   if (state.phaseTime <= 0) {
     clearInterval(state.ticker);
@@ -1175,8 +1816,19 @@ function advance() {
   if (state.phase === 'prep') { state.repIdx=0; enterPhase('work'); }
   else if (state.phase === 'work') {
     if (ex.type==='hold') {
+      if (isUnilateralExercise(ex)) {
+        if (state.repIdx % 2 === 0) state.sideLeft++;
+        else state.sideRight++;
+      }
       state.repIdx++;
       if (state.repIdx < ex.repsPerSet) {
+        const nextRep = state.repIdx + 1;
+        if (isUnilateralExercise(ex)) {
+          const nextSide = state.repIdx % 2 === 0 ? 'left' : 'right';
+          speakCue('Rep ' + nextRep + ', ' + nextSide);
+        } else {
+          speakCue('Rep ' + nextRep);
+        }
         state.phaseTime=ex.holdSec; state.phaseMax=ex.holdSec;
         updateUI();
         clearInterval(state.ticker);
@@ -1188,7 +1840,7 @@ function advance() {
     if (state.setIdx < ex.sets) { enterPhase('rest'); }
     else {
       state.exCompleted++; state.completedNames.push(ex.name);
-      state.setIdx=0; state.exIdx++;
+      state.setIdx=0; state.exIdx++; state.sideLeft=0; state.sideRight=0;
       if (state.exIdx >= sessionPlan.length) finishSession();
       else { enterPhase('between'); renderQueue(); }
     }
@@ -1224,8 +1876,17 @@ function updateUI() {
   // illustration
   const illustWrap = document.getElementById('illus-wrap');
   const displayEx = (state.phase==='between' && sessionPlan[state.exIdx]) ? sessionPlan[state.exIdx] : ex;
-  if (ILLUS[displayEx.id]) illustWrap.innerHTML = ILLUS[displayEx.id];
-  else illustWrap.innerHTML = `<svg viewBox="0 0 90 90"><text x="45" y="50" text-anchor="middle" font-size="9" fill="#55534f" font-family="DM Mono,monospace">${displayEx.name}</text></svg>`;
+  renderExerciseVisual(illustWrap, displayEx);
+
+  const qualityCard = document.getElementById('quality-card');
+  const qualityList = document.getElementById('quality-list');
+  const qualityMistake = document.getElementById('quality-mistake');
+  const checklist = getExerciseChecklist(displayEx);
+  if (qualityCard && qualityList && qualityMistake) {
+    qualityCard.style.display = 'block';
+    qualityList.innerHTML = checklist.map(item => `<li>${item}</li>`).join('');
+    qualityMistake.textContent = getExerciseCommonMistake(displayEx);
+  }
 
   if (state.phase==='between' && sessionPlan[state.exIdx]) {
     const nex = sessionPlan[state.exIdx];
@@ -1243,6 +1904,7 @@ function updateUI() {
   const ringUnit = document.getElementById('ring-unit');
   const repInfo = document.getElementById('rep-info');
   const repCounter = document.getElementById('rep-counter');
+  const sideCounter = document.getElementById('side-counter');
 
   if (state.phase==='work' && ex.type==='hold') {
     ringUnit.textContent='hold';
@@ -1265,6 +1927,16 @@ function updateUI() {
       ? e2.sets+'×'+e2.repsPerSet+' reps · '+e2.holdSec+'s hold'
       : e2.sets+'×'+e2.setDuration+'s';
     repCounter.style.display='none';
+  }
+
+  if (isUnilateralExercise(ex)) {
+    sideCounter.style.display = 'block';
+    const repTarget = ex.type === 'hold' ? ex.repsPerSet : ex.sets;
+    const leftTarget = Math.ceil(repTarget / 2);
+    const rightTarget = Math.floor(repTarget / 2);
+    sideCounter.textContent = `Sides L ${state.sideLeft}/${leftTarget} | R ${state.sideRight}/${rightTarget}`;
+  } else {
+    sideCounter.style.display = 'none';
   }
 
   let dots='';
@@ -1304,6 +1976,7 @@ function renderQueue() {
 
 function togglePause() {
   state.paused=!state.paused;
+  haptic(8);
   const btn=document.getElementById('pause-btn');
   const lbl=document.getElementById('pause-label');
   const icon=document.getElementById('pause-icon');
@@ -1316,7 +1989,7 @@ function togglePause() {
   }
 }
 
-function skipPhase() { clearInterval(state.ticker); state.phaseTime=0; advance(); }
+function skipPhase() { haptic(8); clearInterval(state.ticker); state.phaseTime=0; advance(); }
 
 function endSession() { clearInterval(state.ticker); showDone(); }
 function finishSession() { clearInterval(state.ticker); showDone(); }
@@ -1330,11 +2003,14 @@ function showDone() {
   document.getElementById('done-ex-list-inner').innerHTML = state.completedNames.length
     ? state.completedNames.map(n=>`<div class="done-ex-item"><span style="color:var(--green)">✓</span> ${n}</div>`).join('')
     : '<div class="done-ex-item" style="color:var(--text3)">No exercises completed</div>';
+  updateAnalyticsForSession(elapsed);
+  releaseWakeLock();
   showScreen('s-done');
 }
 
 function resetApp() {
   clearInterval(state.ticker);
+  releaseWakeLock();
   showScreen('s-setup');
   renderSetup();
 }
@@ -1349,13 +2025,11 @@ function showScreen(id) {
 // ════════════════════════════════════════════════════════════════
 function openModal(id, event) {
   if (event) { event.stopPropagation(); event.preventDefault(); }
-  const ex = ALL_EXERCISES.find(e => e.id === id);
+  const ex = getCurrentExercises().find(e => e.id === id);
   if (!ex) return;
 
   const illusEl = document.getElementById('modal-illus');
-  illusEl.innerHTML = ILLUS[id]
-    ? ILLUS[id]
-    : `<svg viewBox="0 0 90 90"><text x="45" y="50" text-anchor="middle" font-size="8" fill="#55534f" font-family="DM Mono,monospace">${ex.name}</text></svg>`;
+  renderExerciseVisual(illusEl, ex);
 
   document.getElementById('modal-name').textContent = ex.name;
   const tagHTML = [
@@ -1386,6 +2060,10 @@ function openModal(id, event) {
     document.getElementById('modal-cue-wrap').style.display = 'none';
   }
 
+  const linkEl = document.getElementById('modal-link');
+  linkEl.href = getExerciseReferenceUrl(ex);
+  linkEl.textContent = 'Open details for ' + ex.name;
+
   document.getElementById('modal-overlay').classList.remove('hidden');
   document.body.style.overflow = 'hidden';
 }
@@ -1396,9 +2074,17 @@ function closeModal(event) {
   document.body.style.overflow = '';
 }
 
+loadPreferences();
+applyA11yClasses();
 applyRandomPreset(chosenMins);
+loadAnalytics();
 renderSetup();
 updateSoundButton();
+updateVoiceButton();
+updateTextButton();
+updateContrastButton();
+updateWakeButton();
+updateAnalyticsUI();
 </script>
 </body>
 </html>
