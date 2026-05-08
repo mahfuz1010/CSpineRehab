@@ -58,7 +58,7 @@ window.APP_EXERCISES = {
     {id:'shoulder-shrugs',name:'Shoulder shrugs',category:'Mobility',seated:true,
      instruction:'Lift shoulders toward ears, pause briefly, then lower them down under control.',
      cue:'Keep neck long and avoid rolling the shoulders forward.',
-     type:'hold',holdSec:5,repsPerSet:12,sets:3,restBetweenSets:20,restBetweenEx:20},
+     type:'hold',holdSec:5,repsPerSet:8,sets:3,restBetweenSets:20,restBetweenEx:20},
 
     {id:'bird-dog',name:'Bird-dog',category:'Stabilization',seated:false,
      instruction:'On hands and knees. Extend right arm and left leg simultaneously. Keep hips level, neck neutral — eyes to floor. Switch sides.',
