@@ -1,0 +1,27 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "A single-page, browser-based guided rehabilitation tool for cervical spine (C5/C6/C7 disc herniation) recovery. No dependencies, no build step — open `index.html` in any modern browser.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "mkdir -p www && cp index.html www/ && cp -r js www/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mahfuz1010/CSpineRehab.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/mahfuz1010/CSpineRehab/issues"
+  },
+  "homepage": "https://github.com/mahfuz1010/CSpineRehab#readme",
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0"
+  }
+}
